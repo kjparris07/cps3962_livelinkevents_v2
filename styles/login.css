@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LiveLink Events – Login</title>
+
+<style>
+    * {
+        /* Global reset and font setting [THIS WORKS FINE] */
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+  }
+
+    /* Page background and layout [THIS WORKS FINE] */
+    body {
+        min-height: 100vh;
+        background: linear-gradient(90deg, #fff7ad, #ffa9f9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /*padding: 40px;*/
+    }
+
+    /* Page container [THIS WORKS FINE] */
+    .login-container {
+        width: 100%;
+        max-width: 450px;
+        padding: 40px 60px 60px;
+        text-align: center;
+    }
+
+    /* Top bar [THIS WORKS FINE]*/
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 80px;
+      padding: 15px 10px;
+      background: #ffefb4; 
+      border-radius: 0px;
+      filter : drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    /* Logo text [THIS WORKS FINE] */
+    .logo {
+      font-size: 30px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #8c52ff, #ff914d);
+      -webkit-background-clip: text;
+      color: transparent;
+      font-style: oblique;
+      font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    }
+
+    /* Login title [THIS WORKS FINE] */
+    .login-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: #ff1fa9;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+        margin-top: 100px;
+    }
+
+    /* Required field note [THIS WORKS FINE] */
+    .required-note {
+        font-size: 14px;
+        color: #ff1fa9;
+        margin-bottom: 30px;
+    }
+
+    /* Input fields [THIS WORKS FINE] */
+    .input-group {
+        text-align: left;
+        margin-bottom: 40px;
+    }
+
+    /* Input label styling [THIS WORKS FINE] */
+    .input-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: #131314;
+        margin-bottom: 6px;
+    }
+
+    /* Input box styling [THIS WORKS FINE] */
+    .input-box {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 120px;
+        border: none;
+        background: #ffffff;
+        font-size: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Log In button styling [THIS WORKS FINE] */
+    .cta-btn {
+      display: inline-block;
+      background: #ff1fa9;
+      color: #ffffff;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(232, 67, 147, 0.4);
+      max-width: 520px;
+      margin-bottom: 10px;
+    }
+
+    /* Footer text [THIS WORKS FINE] */
+    .footer-text {
+        margin-top: 25px;
+        font-size: 15px;
+        color: #000000;
+    }
+
+    /* Sign In link styling [THIS WORKS FINE] */
+    .footer-text span {
+        font-weight: 700;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+</style>
+</head>
+
+
+<body>
+<div class="login-container">
+    <!-- Top bar with logo -->
+    <div class="top-bar">
+        <div class="logo">
+            LiveLink Events
+        </div>
+    </div>
+
+    <div class="login-title">LOG IN</div>
+    <div class="required-note">* Indicates required field</div>
+
+    <div class="input-group">
+        <div class="input-label">Username*</div>
+        <input type="text" class="input-box">
+    </div>
+
+    <div class="input-group">
+        <div class="input-label">Password*</div>
+        <input type="password" class="input-box">
+    </div>
+
+    <div class="cta">
+      <button class="cta-btn">
+        Log In
+      </button>
+    </div>
+    
+    <div class="footer-text">
+        Or<br>
+        <span>Sign In</span> to create an account
+    </div>
+
+</div>
+</body>
+</html>
