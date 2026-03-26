@@ -17,17 +17,17 @@ export default function Home() {
           <div className="container">
               <div>
                   <label htmlFor="location"><h3>Location</h3></label>
-                  <input type="text" name="location" placeholder="Enter City or Zipcode" />
+                  <input className="homeInput" type="text" name="location" placeholder="Enter City or Zipcode" />
                   <button className="babyButton"><a href="/events">&gt;</a></button>
               </div>
               <div>
                   <label htmlFor="date"><h3>Date</h3></label>
-                  <input type="date" name="date" />
+                  <input className="homeInput" type="date" name="date" />
                   <button className="babyButton"><a href="/events">&gt;</a></button>
               </div>
               <div>
                   <label htmlFor="artist"><h3>Artist</h3></label>
-                  <input type="text" name="artist" placeholder="Artist" />
+                  <input className="homeInput" type="text" name="artist" placeholder="Artist" />
                   <button className="babyButton"><a href="/events">&gt;</a></button>
               </div>
           </div>

@@ -8,6 +8,7 @@
 header {
     background-color: #f2eaa0;
     padding: 15px 0;
+    height: 90px;
     display: flex;
     justify-content: space-between;
 }
@@ -47,7 +48,6 @@ input {
     border-radius: 50px;
     border: 0 solid #fff;
     text-align: center;
-    margin-top: 10px;
 }
 
 a {
@@ -60,6 +60,7 @@ button {
     border: 0;
     transition: background 250ms;
     cursor: pointer;
+    height: 34px;
 }
 
 button:hover {
@@ -68,17 +69,20 @@ button:hover {
 
 button a {
     color: #fff;
-    font-weight: bold;
+    line-height: 24px;
 }
 
 /* elements by class or id */
 
-#headerButton {
-    padding: 0 20px;
-    margin: 0 20px 0 0;
-    line-height: 40px;
+.headerButton {
+    padding: 5 20px;
+    line-height: 24px;
     border-radius: 15px;
     font-family: "Open Sans", sans-serif;
+}
+
+.home-input {
+    margin-top: 10px;
 }
 
 #search {
@@ -127,7 +131,6 @@ button a {
     border-radius: 50px;
     height: 34px;
     width: 34px;
-    font-weight: bolder;
     transition: background 250ms;
 }
 

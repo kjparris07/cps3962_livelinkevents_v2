@@ -1,17 +1,34 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { showLogin, hideLogin } from "./scripts/headerScripts";
+import "../styles/main.css";
+import "../styles/signup.css";
 
-async function HeaderButton() {
+async function LoginBar() {
   const cookieStore = await cookies();
   const hasUsername = cookieStore.has("username");
-  return (
-    <button id="headerButton">
-      {/* Only display account if user is logged in */}
-      <a href="/login">
-        {hasUsername ? "Account" : "Sign Up / Log In"}
-      </a>
-    </button>
-  );
+
+  const accButton = <button className='headerButton'><a href='/account'>Account</a></button>;
+  const loginButtons = <div id="login-container">
+                          <div id="input-group">
+                            <div className="label_group">
+                              <label htmlFor="username-input">Username*</label>
+                              <input type="text" id="username-input" required />
+                            </div>
+                            
+                            <div className="label_group">
+                              <label htmlFor="password-input">Password*</label>
+                              <input type="password" id="password-input" required />
+                            </div>
+
+                            <button className='headerButton' id='loginButton' onClick={showLogin}>Login</button>
+                            <button className='headerButton' id='signupButton' onClick={hideLogin}><a href='/signup'>Sign Up</a></button>
+                          </div>
+
+                          <div id="required-note">* Indicates required field</div>
+                       </div>;
+                       
+  return hasUsername ? accButton : loginButtons;
 }
 
 export const metadata: Metadata = {
@@ -39,7 +56,7 @@ export default function RootLayout({
               <h2><a href="/"><i>LiveLink Events</i></a></h2>
           </span>
           <span>
-              <HeaderButton />
+              {LoginBar()}
           </span>
         </header>
         {children}
