@@ -1,179 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>LiveLink Events - Become a Member</title>
-  <style>
-    * {
-      /* Global reset and font setting [THIS WORKS FINE] */
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+* {
+  /* Global reset and font setting [THIS WORKS FINE] */
+  margin: 0;
+  padding: 0;
+}
 
-    /* Page background and layout [THIS WORKS FINE] */
-    body {
-      min-height: 100vh;
-      background: linear-gradient(90deg, #fff7ad, #ffa9f9);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+/* Page container [THIS WORKS FINE] */
+.page {
+  width: 100%;
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-    /* Page container [THIS WORKS FINE] */
-    .page {
-      width: 100%;
-      max-width: 1200px;
-      padding: 40px 60px 60px;
-      position: relative;
-    }
+/* Main heading [THIS WORKS FINE] */
+.hero-text {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 800;
+  color: #ff1fa9;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
 
-    /* Top bar [THIS WORKS FINE]*/
-    .top-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 80px;
-      padding: 15px 10px;
-      background: #ffefb4; 
-      border-radius: 0px;
-      filter : drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-    }
+/* White background container for benefits [THIS WORKS FINE] */
+.white-background{
+  background-color: #ffffffcc;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+}
 
-    /* Logo with gradient text [THIS WORKS FINE] */
-    .logo {
-      font-size: 30px;
-      font-weight: 700;
-      background: linear-gradient(90deg, #8c52ff, #ff914d);
-      -webkit-background-clip: text;
-      color: transparent;
-      font-style: oblique;
-      font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    }
+/* Subtitle "Members enjoy" Styling [THIS WORKS FINE] */
+.subtitle {
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: 700;
+  color: rgb(0, 0, 0);
+}
 
-    /* Login/Signin button [THIS WORKS FINE] */
-    .auth-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0px;
-      padding: 10px 20px;
-      border-radius: 999px;
-      border: 2px solid #ffffffcc;
-      background-color: #ffffffcc;
-      color: #000000;
-      font-weight: 550;
-      cursor: pointer;
-    }
+/* Bullet list "Benefits" [THIS WORKS FINE] */
+.benefits {
+    text-align: left;
+    margin: 0 35px;
+    width: 30vw;
+    font-size: 16px;
+    color: #131314;
+    line-height: 1.6;
+}
 
-    /* Main heading [THIS WORKS FINE] */
-    .hero-text {
-      text-align: center;
-      font-size: 36px;
-      font-weight: 800;
-      color: #ff1fa9;
-      margin-bottom: 10px;
-      letter-spacing: 1px;
-      margin-top: 100px;
-    }
-
-    /* White background container for benefits [THIS WORKS FINE] */
-    .white-background{
-      background-color: #ffffffcc;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-top:60px;
-    }
-
-    /* Subtitle "Members enjoy" Styling [THIS WORKS FINE] */
-    .subtitle {
-        margin-top: 10px;
-        font-size: 22px;
-        font-weight: 700;
-        color: rgb(0, 0, 0);
-        margin-bottom: 50px;
-    }
-
-    /* Bullet list "Benefits" [THIS WORKS FINE] */
-    .benefits {
-        text-align: left;
-        margin: 0 auto 35px;
-        max-width: 500px;
-        font-size: 16px;
-        color: #131314;
-        line-height: 1.6;
-    }
-
-    /* Benefits list margin [THIS WORKS FINE] */
-    .benefits li {
-        margin-bottom: 12px;
-    }
+/* Benefits list margin [THIS WORKS FINE] */
+.benefits li {
+    margin-bottom: 12px;
+}
 
 
-    /* Bottom member [THIS WORKS FINE] */
-    .member {
-      margin-top: 50px;
-      text-align: center;
-    }
-
-    /* Member button Styling [THIS WORKS FINE]*/
-    .member-btn {
-      display: inline-block;
-      background: #ff1fa9;
-      color: #ffffff;
-      padding: 14px 28px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 14px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(232, 67, 147, 0.4);
-      max-width: 520px;
-      margin-bottom: 50px;
-    }
-    </style>
-</head>
-
-
-<body>
-  <div class="page">
-    <!-- Top bar -->
-    <div class="top-bar">
-      <div class="logo">
-        LiveLink Events<span></span>
-      </div>
-      <button class="auth-btn">
-        <span class="auth-btn-icon"></span>
-        Sign in/Log in
-      </button>
-    </div>
-
-    <!-- Main heading -->
-    <div class="hero-text">
-    UPGRADE YOUR EXPERIENCE AND </br> BECOME A MEMBER TODAY!
-    </div>
-    <div class="white-background"> 
-      <div class="subtitle">Members enjoy:</div>
-    
-      <ul class="benefits">
-        <li>Higher-quality seats that offer closeness to the stage, a better view, and extra comfort.</li>
-        <li>Early notifications.</li>
-        <li>Enhanced alerts, including price drop.</li>
-        <li>Exclusive deals on tickets and artist merchandise.</li>
-        <li>Priority access to tickets for high-demand events. </li>
-        <li>Exclusive access to members-only events, such as pre-sales, meet-and-greets, and special performances.</li>
-        <li>Early access to tickets before general sale starts.</li>
-      </ul>
-    <div class="member">
-    <button class="member-btn">Become a Member</button>
-    </div>
-
-</div>
-</body>
-</html>
+/* Bottom member [THIS WORKS FINE] */
+.member {
+  margin-top: 50px;
+  text-align: center;
+}
