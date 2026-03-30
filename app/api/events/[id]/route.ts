@@ -3,8 +3,10 @@ import { events } from "@/lib/events";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const { params } = context;
+
   const event = events.find(e => e.id === params.id);
 
   if (!event) {
