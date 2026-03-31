@@ -5,7 +5,9 @@ export default function LoginPage() {
     <main className="login-page">
       <div className="login-container">
         <div className="top-bar">
-          <div className="logo">LiveLink Events</div>
+          <a href="/" className="logo">
+            LiveLink Events
+          </a>
         </div>
 
         <div className="login-title">LOG IN</div>
