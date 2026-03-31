@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import "../styles/main.css";
 import "../styles/signup.css";
 import "../styles/membership.css";
-import "../styles/login.css";
+import "../styles/signin.css";
 
 async function LoginBar() {
   const cookieStore = await cookies();
