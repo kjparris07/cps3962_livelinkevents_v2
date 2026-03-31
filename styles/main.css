@@ -1,144 +1,309 @@
-/* applies to every element */
-* {
-    margin: 0;
-    padding: 0;
+/* [ALL THIS WORKS FINE] */
+
+*{
+    box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* Page background and layout [THIS WORKS FINE] */
+    body {
+      min-height: 100vh;
+      background: linear-gradient(90deg, #fff7ad, #ffa9f9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Page container [THIS WORKS FINE] */
+    .page {
+      width: 100%;
+      max-width: 1200px;
+      padding: 40px 60px 60px;
+      position: relative;
+    }
+
+    /* Top bar [THIS WORKS FINE]*/
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 80px;
+      padding: 15px 10px;
+      background: #ffefb4; 
+      border-radius: 0px;
+      filter : drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    /* Logo with gradient text [THIS WORKS FINE] */
+    .logo {
+      font-size: 30px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #8c52ff, #ff914d);
+      -webkit-background-clip: text;
+      color: transparent;
+      font-style: oblique;
+      font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      text-decoration: none;
+    }
+
+    /* Login/Signin button [THIS WORKS FINE] */
+    .auth-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 2px solid #ffffffcc;
+      background-color: #ffffffcc;
+      color: #000000;
+      font-weight: 550;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* Login/Signin button hover color change [THIS WORKS FINE] */
+    .auth-btn:hover {
+        background-color: #ff914d;
+        color: white;
+        transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+
+    /* Main heading [THIS WORKS FINE] */
+    .hero-text {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 800;
+      color: #ff1fa9;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      margin-top: 100px;
+    }
+
+    /* Search section [THIS WORKS FINE] */
+    .search-box {
+      max-width: 900px;
+      margin: 0 auto;
+      margin-top: 60px;
+      background: #ffffffdd;
+      border-radius: 20px;
+      padding: 25px 30px 30px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      text-decoration: none;
+    }
+
+    /* Search title [THIS WORKS FINE] */
+    .search-title {
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #2d3436;
+    }
+
+    /* Search fields grid layout [THIS WORKS FINE] */
+    .search-fields {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    /* Individual field styling [THIS WORKS FINE] */
+    .field-label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #636e72;
+    }
+
+    /* Input box styling [THIS WORKS FINE] */
+    .field-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dfe6e9;
+      font-size: 14px;
+      color: #2d3436;
+    }
+
+    /* Placeholder text color [THIS WORKS FINE] */
+    .field-input::placeholder {
+      color: #b2bec3;
+    }
+
+    /* Search button [THIS WORKS FINE] */
+    .search {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Search button hover color change [THIS WORKS FINE] */
+    .search button:hover {
+        background-color: #ff914d;
+        transition: background-color 0.25s ease;
+    }
+
+    /* Search button styling [THIS WORKS FINE] */
+    .search button {
+      background: #ff1fa9;
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(232, 67, 147, 0.4);
+      margin-right: 20px;
+      text-decoration: none;
+    }
+    
+    /* Bottom CTA [THIS WORKS FINE] */
+    .cta {
+      margin-top: 100px;
+      text-align: center;
+    }
+
+    /* CTA button styling [THIS WORKS FINE] */
+    .cta-btn {
+      display: inline-block;
+      background: #ff1fa9;
+      color: #ffffff;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(232, 67, 147, 0.4);
+      max-width: 520px;
+      width: 100%;
+    }
+
+    /* CTA button hover color change [THIS WORKS FINE] */
+    .cta-btn:hover {
+        background-color: #ff914d;
+        transition: background-color 0.25s ease;
+    }
+
+    @media (max-width: 800px) {
+      .page {
+        padding: 30px 20px 40px;
+      }
+
+      .hero-text {
+        font-size: 28px;
+      }
+
+      .search-fields {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-btn {
+        max-width: 100%;
+      }
+      
+    }
+
+.signin-container{
+  width: 100%;
+  max-width: 450px;
+  padding: 40px 60px 60px;
+  text-align: center;
 }
 
-/* elements by type */
-header {
-    background-color: #f2eaa0;
-    padding: 15px 0;
-    height: fit-content;
-    display: flex;
-    justify-content: space-between;
+ /* Title */
+.signin-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ff1fa9;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  margin-top: 100px;
+  text-align:center;
 }
 
-header h2 {
-    font-family: "Playfair Display", serif;
-    font-weight: 900;
-    font-size: 36px;
-    line-height: 36px;
-    margin-left: 20px;
+/* LogIn Tittle */
+.login-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: #ff1fa9;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+        margin-top: 100px;
+        text-align: center;
+    }
+
+/* Required note */
+.required-note {
+font-size: 14px;
+color: #ff1fa9;
+margin-bottom: 30px;
+text-align:center;
 }
 
-header h2 a {
-    color: black;
+/* Input group wrapper */
+.input-group {
+margin-bottom:40px;
 }
 
-body {
-    width: 100vw;
-    background: #f2eaa0;
-    background: linear-gradient(90deg, rgba(242, 234, 160, 1) 0%, rgba(242, 182, 240, 1) 93%);
-    font-family: "Open Sans", sans-serif;
+/* Label */
+.input-label {
+font-size: 16px;
+font-weight: 500;
+color: #131314;
+margin-bottom: 6px;
 }
 
-h1 {
-    margin-top: 20px;
-    color: #e81798;
-    font-size: 40px;
-    text-align: center;
-    font-family: "Climate Crisis", sans-serif;
+/* Input box styling */
+.input-box {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 120px;
+  border: none;
+  background: #ffffff;
+  font-size: 15px;
+  max-width: 300px;  
 }
 
-input {
-    width: 224px;
-    font-size: 18px;
-    padding: 5px;
-    line-height: 24px;
-    border-radius: 50px;
-    border: 0 solid #fff;
-    text-align: center;
+/* Input hover + focus */
+.input-box:focus {
+  border-color: #ff914d;
+  box-shadow: 0 0 8px rgba(255, 145, 77, 0.5);
 }
 
-a {
-    text-decoration: none;
+/* Footer text */
+.footer-text {
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  text-align:center;
 }
 
-button {
-    background-color: #e81798;
-    color: #fff;
-    border: 0;
-    transition: background 250ms;
-    cursor: pointer;
-    height: 34px;
-    border-radius: 50px;
-    height: 34px;
-    line-height: 24px;
+/* Footer link */
+.footer-link {
+  color: #ff1fa9;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align:center;
 }
 
-button:hover {
-    background-color: black;
+.footer-link:hover {
+  color: #ff914d;
 }
 
-button a {
-    color: #fff;
-    line-height: 24px;
-}
-
-/* elements by class or id */
-
-.headerButton {
-    padding: 5 20px;
-    line-height: 24px;
-    border-radius: 15px;
-    font-family: "Open Sans", sans-serif;
-}
-
-.home-input {
-    margin-top: 10px;
-}
-
-#search {
-    margin: 20px 0 15px 10vw;
-}
-
-.container {
-    margin: 10px auto;
-    width: 80vw;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.container > * {
-    text-align: center;
-    justify-self: center;
-    margin: 0 auto 50px auto;
-}
-
-.bigButton {
-    background-color: #e81798;
-    color: #fff;
-    font-size: 30px;
-    display: block;
-    width: fit-content;
-    padding: 10px 20px;
-    border-radius: 50px;
-    transition: background 250ms;
-    margin: auto auto 40px auto;
-}
-
-.bigButton a {
-    color: #fff;
-}
-
-.bigButton:hover {
-    background-color: black;
-}
-
-.babyButton {
-    margin-left: 10px;
-    background-color: #e81798;
-    color: #fff;
-    border: 0;
-    transition: background 250ms;
-    width: 34px;
-}
-
-.babyButton a {
-    color: #fff;
-}
-
-.babyButton:hover {
-    background-color: black;
+.payment-title{
+  font-size: 36px;
+  font-weight: 800;
+  color: #ff1fa9;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  margin-top: 100px;
+  text-align: center;
 }

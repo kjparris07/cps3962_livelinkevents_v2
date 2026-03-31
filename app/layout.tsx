@@ -53,10 +53,10 @@ export default function RootLayout({
         {/* Header here for consistency between pages */}
         <header>
           <span>
-              <h2><a href="/"><i>LiveLink Events</i></a></h2>
+              {/*<h2><a href="/"><i>LiveLink Events</i></a></h2>*/}
           </span>
           <span>
-              {LoginBar()}
+              {/*{LoginBar()}*/}
           </span>
         </header>
         {children}

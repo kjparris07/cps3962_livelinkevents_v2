@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>LiveLink Events – Sign In</title>
-
-<style>
-    * {
+* {
         /* Global reset and font setting [THIS WORKS FINE] */
         box-sizing: border-box;
         margin: 0;
@@ -130,53 +123,90 @@
         cursor: pointer;
     }
 
-</style>
-</head>
+    .signin-container{
+    text-align: center;
+    width: fit-content;
+    max-width: 450px;
+    padding: 40px 60px 60px;
+    margin: 0 auto;
+}
 
+ /* Title */
+.signin-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ff1fa9;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  margin-top: 100px;
+  text-align:center;
+}
 
-<body>
-<div class="page">
-    <!-- Top bar with logo -->
-    <div class="top-bar">
-        <div class="logo">
-            LiveLink Events
-        </div>
-    </div>
+/* LogIn Tittle */
+.login-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: #ff1fa9;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+        margin-top: 100px;
+        text-align: center;
+    }
 
-    <div class="signin-title">SIGN IN</div>
-    <div class="required-note">* Indicates required field</div>
+/* Required note */
+.required-note {
+font-size: 14px;
+color: #ff1fa9;
+margin-bottom: 30px;
+text-align:center;
+}
 
-    <div class="input-group">
-        <div class="input-label">Username*</div>
-        <input type="text" class="input-box">
-    </div>
+/* Input group wrapper */
+.input-group {
+margin-bottom:40px;
+}
 
-    <div class="input-group">
-        <div class="input-label">Email Address*</div>
-        <input type="email" class="input-box">
-    </div>
+/* Label */
+.input-label {
+font-size: 16px;
+font-weight: 500;
+color: #131314;
+margin-bottom: 6px;
+}
 
-    <div class="input-group">
-        <div class="input-label">Create Password*</div>
-        <input type="password" class="input-box">
-    </div>
-    
-    <div class="input-group">
-        <div class="input-label">Confirm Password*</div>
-        <input type="password" class="input-box">
-    </div>
+/* Input box styling */
+.input-box {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 120px;
+  border: none;
+  background: #ffffff;
+  font-size: 15px;
+  max-width: 300px;  
+}
 
-    <div class="cta">
-      <button class="cta-btn">
-        Create Account
-      </button>
-    </div>
-    
-    <div class="footer-text">
-        Already have an account?<br>
-        <span>Log In</span>
-    </div>
-    
-</div>
-</body>
-</html>
+/* Input hover + focus */
+.input-box:focus {
+  border-color: #ff914d;
+  box-shadow: 0 0 8px rgba(255, 145, 77, 0.5);
+}
+
+/* Footer text */
+.footer-text {
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  text-align:center;
+}
+
+/* Footer link */
+.footer-link {
+  color: #ff1fa9;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align:center;
+}
+
+.footer-link:hover {
+  color: #ff914d;
+}
