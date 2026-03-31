@@ -5,7 +5,19 @@
   box-sizing: border-box;
 }
 
-/* elements by type */
+/* page background and base text */
+body {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(
+    90deg,
+    rgba(242, 234, 160, 1) 0%,
+    rgba(242, 182, 240, 1) 93%
+  );
+  font-family: "Open Sans", sans-serif;
+}
+
+/* header */
 header {
   background-color: #f2eaa0;
   padding: 15px 0;
@@ -15,29 +27,19 @@ header {
 }
 
 header h2 {
+  margin-left: 20px;
   font-family: "Playfair Display", serif;
   font-weight: 900;
   font-size: 36px;
   line-height: 36px;
-  margin-left: 20px;
 }
 
 header h2 a {
   color: black;
+  text-decoration: none;
 }
 
-body {
-  width: 100%;
-  min-height: 100vh;
-  background: #f2eaa0;
-  background: linear-gradient(
-    90deg,
-    rgba(242, 234, 160, 1) 0%,
-    rgba(242, 182, 240, 1) 93%
-  );
-  font-family: "Open Sans", sans-serif;
-}
-
+/* main heading */
 h1 {
   margin-top: 20px;
   color: #e81798;
@@ -46,27 +48,23 @@ h1 {
   font-family: "Climate Crisis", sans-serif;
 }
 
-input {
-  width: 224px;
-  font-size: 18px;
-  padding: 5px;
-  line-height: 24px;
-  border-radius: 50px;
-  border: 0 solid #fff;
-  text-align: center;
-  margin-top: 10px;
+/* search heading */
+#search {
+  margin: 20px 0 15px 10vw;
 }
 
+/* generic links */
 a {
   text-decoration: none;
 }
 
+/* generic button styles */
 button {
   background-color: #e81798;
-  color: #fff;
+  color: #ffffff;
   border: 0;
-  transition: background 250ms ease;
   cursor: pointer;
+  transition: background 250ms ease;
 }
 
 button:hover {
@@ -74,12 +72,11 @@ button:hover {
 }
 
 button a {
-  color: #fff;
+  color: #ffffff;
   font-weight: bold;
 }
 
-/* elements by class or id */
-
+/* header button */
 #headerButton {
   padding: 0 20px;
   margin: 0 20px 0 0;
@@ -88,13 +85,22 @@ button a {
   font-family: "Open Sans", sans-serif;
 }
 
-#search {
-  margin: 20px 0 15px 10vw;
+/* form inputs */
+input {
+  width: 224px;
+  margin-top: 10px;
+  padding: 5px;
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+  border: 0 solid #ffffff;
+  border-radius: 50px;
 }
 
+/* search row container */
 .container {
-  margin: 10px auto;
   width: 80vw;
+  margin: 10px auto;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -102,91 +108,84 @@ button a {
 }
 
 .container > * {
+  margin: 0 auto;
   text-align: center;
   justify-self: center;
-  margin: 0 auto;
 }
 
+/* main pink pill button */
 .bigButton {
-  background-color: #e81798;
-  color: #fff;
-  font-size: 30px;
   display: block;
-  margin: 50px auto;
   width: fit-content;
+  margin: 50px auto;
   padding: 10px 20px;
+  background-color: #e81798;
+  color: #ffffff;
+  font-size: 30px;
   border-radius: 50px;
   transition: background 250ms ease;
 }
 
 .bigButton a {
-  color: #fff;
+  color: #ffffff;
 }
 
 .bigButton:hover {
   background-color: black;
 }
 
+/* small round search buttons */
 .babyButton {
+  width: 34px;
+  height: 34px;
   margin-left: 10px;
   background-color: #e81798;
-  color: #fff;
+  color: #ffffff;
   border: 0;
   border-radius: 50px;
-  height: 34px;
-  width: 34px;
   font-weight: bolder;
   transition: background 250ms ease;
 }
 
 .babyButton a {
-  color: #fff;
+  color: #ffffff;
 }
 
 .babyButton:hover {
   background-color: black;
 }
 
-/* Premium membership section */
-
+/* premium membership section wrapper */
 .premium-box-wrapper {
   width: 100%;
-  display: flex;
-  justify-content: center;
   margin-top: 25px;
   margin-bottom: 40px;
+  display: flex;
+  justify-content: center;
 }
 
+/* blue outlined box */
 .premium-box {
   width: 520px;
   padding: 30px;
-  border: 4px solid #0b4a92;
-  border-radius: 8px;
   text-align: center;
   background-color: transparent;
+  border: 4px solid #0b4a92;
+  border-radius: 8px;
 }
 
-/* This targets the BigButton when it is inside the premium box */
+/* remove normal big button pill style when inside premium box */
 .premium-box .bigButton {
-  background-color: transparent;
-  color: #0b4a92;
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  width: auto;
   margin: 0 auto;
   padding: 0;
+  background-color: transparent;
   border-radius: 0;
-  width: auto;
-}
-
-.premium-box .bigButton a {
   color: #0b4a92;
   font-family: Arial, Helvetica, sans-serif;
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: 1px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
@@ -194,12 +193,53 @@ button a {
   background-color: transparent;
 }
 
-/* Optional class if you use membership-btn directly somewhere else */
+/* shimmer premium text */
+.premium-box .bigButton a {
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(
+    90deg,
+    #0b4a92 0%,
+    #46b8ff 20%,
+    #d7f4ff 35%,
+    #0b4a92 50%,
+    #7ad7ff 70%,
+    #0b4a92 100%
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 8px rgba(70, 184, 255, 0.35);
+  animation: shimmer 3.5s linear infinite;
+}
+
+/* premium box subtle glow on hover */
+.premium-box:hover {
+  box-shadow: 0 0 18px rgba(70, 184, 255, 0.25);
+  transition: box-shadow 250ms ease;
+}
+
+/* optional class if used somewhere else */
 .membership-btn {
   font-family: Arial, Helvetica, sans-serif;
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: 1px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: #0b4a92;
+}
+
+/* shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: 0% center;
+  }
+
+  100% {
+    background-position: 250% center;
+  }
 }
