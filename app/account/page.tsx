@@ -6,6 +6,7 @@ export default function Home() {
     <main>
       <div className="container">
         <h1>ACCOUNT</h1>
+        <p>Hello World</p>
       </div>
     </main>
   );
