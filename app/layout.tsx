@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import Layout from "./globalComponents/Layout";
+import LoginBar from "./globalComponents/LoginBar";
 import "../styles/main.css";
 import "../styles/signup.css";
 import "../styles/membership.css";
 import "../styles/signin.css";
+import ClientProviders from "./globalComponents/ClientProviders";
 
 export const metadata: Metadata = {
   title: "LiveLink Events",
@@ -31,9 +32,13 @@ export default async function RootLayout({
       </head>
       <body>
         <header>
-          {await Layout()}
+          <ClientProviders>
+            <LoginBar />
+          </ClientProviders>
         </header>
-        {children}
+        <ClientProviders>
+          {children}
+        </ClientProviders>
       </body>
     </html>
   );

@@ -17,7 +17,6 @@ type DateFormData = {
   date: string;
 };
 
-
 export default function Home() {
   const { register, handleSubmit } = useForm<any>();
   const [results, setResults] = useState<any[]>([]);

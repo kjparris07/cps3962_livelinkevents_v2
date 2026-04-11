@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import { useCookies } from 'react-cookie';
 import { createAccount } from '../actions';
 
 import "../../styles/signup.css";
@@ -25,6 +26,7 @@ type SignUpFormData = {
 
 export default function SignUpPage() {
   const router = useRouter();
+  const [ _, setCookie ] = useCookies();
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, watch } = useForm<SignUpFormData>({
     defaultValues: {
@@ -44,11 +46,14 @@ export default function SignUpPage() {
       }
     });
 
-  const result = await createAccount(fd);
-  if (result.success) {
-    router.push('/account');
-  }
-  setLoading(false);
+    const result = await createAccount(fd);
+    if (result.success) {
+      setCookie("email", fd.get('email'));
+      router.push('/account');
+    } else {
+      console.log(result.error);
+    }
+    setLoading(false);
   };
 
   return (

@@ -1,30 +1,63 @@
+'use client'
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useCookies } from 'react-cookie';
+import { useRouter } from 'next/navigation';
+import { logIn } from '../actions';
+
 import "@/styles/signin.css";
 
+type SignInFormData = {
+  email: string;
+  password: string;
+};
+
 export default function LoginPage() {
+  const router = useRouter();
+  const [ _, setCookie ] = useCookies();
+  const [loading, setLoading] = useState(false);
+  const { register, handleSubmit } = useForm<SignInFormData>();
+  
+  const onSubmit = async (data: SignInFormData) => {
+    setLoading(true);
+    const fd = new FormData();
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        fd.append(key, value.toString());
+      }
+    });
+
+  const result = await logIn(fd);
+  if (result.success) {
+    setCookie("email", data.email);
+    router.push('/account');
+  }
+  setLoading(false);
+  };
+
   return (
     <main className="login-page">
-      <div className="login-container">
-        <div className="top-bar">
-          <a href="/" className="logo">
-            LiveLink Events
-          </a>
-        </div>
+      <form className="login-container" onSubmit={handleSubmit(onSubmit)}>
 
         <div className="login-title">LOG IN</div>
         <div className="required-note">* Indicates required field</div>
 
         <div className="input-group">
-          <div className="input-label">Username*</div>
-          <input type="text" className="input-box" />
+          <div className="input-label">Email*</div>
+          <input type="text" className="input-box" {...register("email", {required: true})}/>
         </div>
 
         <div className="input-group">
           <div className="input-label">Password*</div>
-          <input type="password" className="input-box" />
+          <input type="password" className="input-box" {...register("password", {required: true})}/>
         </div>
 
         <div className="cta">
-          <button className="cta-btn">Log In</button>
+          <button className="cta-btn" disabled={ loading }>
+            { loading ? 'Logging In...' : 'Log In' }
+          </button>
         </div>
 
         <div className="footer-text">
@@ -32,10 +65,10 @@ export default function LoginPage() {
           <br />
           <a href="/signup" className="footer-link">
             Sign Up
-          </a>{" "}
+          </a>
           to create an account
         </div>
-      </div>
+      </form>
     </main>
   );
 }

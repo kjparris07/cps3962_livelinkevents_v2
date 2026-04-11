@@ -4,27 +4,57 @@ import bcrypt from 'bcryptjs';
 
 
 export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 12; 
-  
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  return hashedPassword;
+    const saltRounds = 12; 
+    
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return await bcrypt.compare(password, hash);
+    return await bcrypt.compare(password, hash);
+}
+
+export async function logIn(formData: FormData) {
+    const email =  formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+        const accounts = await query(
+            `SELECT password
+            FROM users
+            WHERE email=$1;`, [`${email}`]);
+
+        if (accounts.rows.length == 0) {
+            return { success: false, error: "No account found." };
+        }
+
+        if (accounts.rows.length > 1) {
+            return { success: false, error: "Multiple accounts found." };
+        }
+        
+        const isValid = await verifyPassword(password, accounts.rows[0]);
+        if (isValid) {
+            return { success: true }; 
+        } else {
+            return { success: false, error: "Invalid credentials." };
+        }
+    } catch (error) {
+        return { success: false, error: "Error checking database." };
+    }
 }
 
 export async function createAccount(formData: FormData) {
     const email = formData.get('email') as string;
 
     try {
+        console.log("HELLO WORLD");
         const accounts = await query(
             `SELECT email 
             FROM users 
             WHERE email=$1;`, [`${email}`]);
         
         if (accounts.rows.length > 0) {
-            return { success: false, error: "User already exists. "}
+            return { success: false, error: "User already exists."};
         }
 
         try {
