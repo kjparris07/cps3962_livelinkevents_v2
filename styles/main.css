@@ -2,6 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+<<<<<<< HEAD
   font-family: "Open Sans", sans-serif;
 }
 
@@ -10,9 +11,44 @@ body {
   background: linear-gradient(90deg, #fff7ad, #ffa9f9);
   display: flex;
   justify-content: center;
-  align-items: center;
+=======
+  box-sizing: border-box;
 }
 
+body {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(
+    90deg,
+    rgba(242, 234, 160, 1) 0%,
+    rgba(242, 182, 240, 1) 93%
+  );
+  font-family: "Open Sans", sans-serif;
+}
+
+.top-bar {
+  width: 100%;
+  padding: 16px 32px;
+  display: flex;
+>>>>>>> deli
+  align-items: center;
+  justify-content: space-between;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  background: linear-gradient(
+    90deg,
+    rgba(242, 234, 160, 0.72) 0%,
+    rgba(242, 182, 240, 0.42) 100%
+  );
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+<<<<<<< HEAD
 .page {
   width: 100%;
   max-width: 1200px;
@@ -70,70 +106,224 @@ body {
 }
 
 .hero-text {
+=======
+.avatar-hover {
+  margin-left: auto;
+}
+
+.logo,
+.logo:link,
+.logo:visited,
+.logo:hover,
+.logo:active {
+  font-family: "Playfair Display", serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 36px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  display: inline-block;
+  background: linear-gradient(90deg, #ff1fa9 0%, #c084fc 45%, #ffd166 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(255, 31, 169, 0.18);
+}
+
+.avatar-hover {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ff1fa9;
+  color: white;   /* ✅ make icon white */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.avatar-label {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  background: #ff1fa9;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.avatar-hover:hover .avatar-label {
+  opacity: 1;
+}
+
+#tagline {
+  margin-top: 26px;
+  color: #e81798;
+  font-size: 58px;
+>>>>>>> deli
   text-align: center;
   font-size: 36px;
   font-weight: 800;
   color: #ff1fa9;
   margin-top: 100px;
   font-family: "Climate Crisis", sans-serif;
-}
-
-.search-box {
+  line-height: 1.05;
   max-width: 900px;
-  margin: 60px auto;
-  background: #ffffffdd;
-  border-radius: 20px;
-  padding: 25px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.search-fields {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+#search {
+  margin: 24px 0 15px 10vw;
+  font-size: 34px;
+  font-weight: 800;
+  color: #000000;
 }
 
-.field-input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
+a {
+  text-decoration: none;
 }
 
-.search {
-  margin-top: 20px;
+input {
+  width: 270px;
+  margin-top: 10px;
+  padding: 12px 18px;
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+  border: 0;
+  border-radius: 50px;
+  background: #f5f5f5;
+}
+
+.container {
+  width: 86vw;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.container > * {
+  margin: 0 auto;
   text-align: center;
 }
 
-.search button {
-  background: #ff1fa9;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 999px;
-  border: none;
-  margin: 5px;
+.search-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.search button:hover {
-  background: black;
-  transition: background-color 0.5s ease;
-  cursor: pointer;
+.search-card h3,
+.container h3 {
+  font-size: 28px;
+  margin-bottom: 8px;
 }
 
-.cta {
-  margin-top: 80px;
+.babyButton,
+.babyButton:link,
+.babyButton:visited {
+  width: 28px;
+  height: 28px;
+  margin-top: 8px;
+  background-color: #e81798;
+  color: #ffffff;
+  border-radius: 50%;
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background 250ms ease, transform 250ms ease;
+}
+
+.babyButton:hover,
+.babyButton:active {
+  background-color: #c91482;
+  transform: scale(1.04);
+}
+
+.action-row {
+  width: 86vw;
+  margin: 34px auto 40px;
+  display: flex;
+  flex-direction: column;   /* 🔥 THIS stacks them */
+  align-items: flex-start;  /* keeps them left aligned */
+  gap: 20px;                /* space between buttons */
+}
+
+.premium-box {
+  width: fit-content;
+}
+
+.view-events-btn,
+.view-events-btn:link,
+.view-events-btn:visited {
+  display: inline-block;
+  background-color: #ff1fa9;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 12px 22px;
+  border-radius: 18px;
+  border: 3px solid #ff8ad8;
+  transition: transform 250ms ease, background 250ms ease;
+}
+
+.view-events-btn:hover,
+.view-events-btn:active {
+  background-color: #d91588;
+  transform: translateY(-1px);
+}
+
+.premium-box,
+.premium-box:link,
+.premium-box:visited {
+  width: 360px;
+  padding: 16px 18px;
   text-align: center;
+  text-decoration: none;
+  border: 3px solid #0b4a92;
+  border-radius: 16px;
+  font-family: "Playfair Display", serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 22px;
+  background: linear-gradient(90deg, #0b4a92 0%, #46b8ff 45%, #d7f4ff 70%, #0b4a92 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 8px rgba(70, 184, 255, 0.2);
+  transition: box-shadow 250ms ease, transform 250ms ease;
 }
 
-.cta-btn {
-  background: #ff1fa9;
-  color: white;
-  padding: 14px 28px;
-  border-radius: 999px;
-  border: none;
+.premium-box:hover,
+.premium-box:active {
+  box-shadow: 0 0 18px rgba(70, 184, 255, 0.25);
+  transform: translateY(-1px);
 }
-
-.cta-btn:hover {
-  background: black;
-  transition: background-color 0.5s ease;
-  cursor: pointer;
-}
-

@@ -5,15 +5,16 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.signup-page {
+.login-page {
   min-height: 100vh;
+  background: linear-gradient(90deg, #fff7ad, #ffa9f9);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 120px;
 }
 
-.signup-container {
-  margin-top: 50px;
+.login-container {
   width: 100%;
   max-width: 450px;
   padding: 40px 60px 60px;
@@ -23,35 +24,40 @@
 .top-bar {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  padding: 15px 10px;
+  padding: 18px 28px;
   background: #ffefb4;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
 }
 
-.logo {
-  font-size: 30px;
-  font-weight: 700;
-  background: linear-gradient(90deg, #8c52ff, #ff914d);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-style: oblique;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+.logo,
+.logo:link,
+.logo:visited,
+.logo:hover,
+.logo:active {
+  font-size: 24px;
+  font-weight: 800;
+  font-style: italic;
   text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  background: linear-gradient(90deg, #ff1fa9, #c084fc, #ffd166);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(255, 31, 169, 0.18);
 }
 
-.signup-title {
+.login-title {
   font-size: 36px;
   font-weight: 800;
   color: #ff1fa9;
   margin-bottom: 10px;
   letter-spacing: 1px;
-  margin-top: 100px;
 }
 
 .required-note {
@@ -62,27 +68,30 @@
 
 .input-group {
   text-align: left;
-  margin-bottom: 30px;
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 40px;
 }
 
 .input-label {
+  display: block;
   font-size: 16px;
   font-weight: 500;
   color: #131314;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .input-box {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 120px;
+  padding: 18px 20px;
+  border-radius: 999px;
   border: none;
-  background: #ffffff;
+  background: #f8f8f8;
   font-size: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  outline: none;
+}
+
+.input-box:focus {
+  box-shadow: 0 0 0 2px rgba(255, 31, 169, 0.25);
 }
 
 .cta {
@@ -93,26 +102,30 @@
   display: inline-block;
   background: #ff1fa9;
   color: #ffffff;
-  padding: 14px 28px;
+  padding: 14px 32px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(232, 67, 147, 0.4);
-  max-width: 520px;
+  box-shadow: 0 8px 18px rgba(232, 67, 147, 0.35);
   margin-bottom: 10px;
+}
+
+.cta-btn:hover {
+  transform: translateY(-1px);
 }
 
 .footer-text {
   margin-top: 25px;
   font-size: 15px;
   color: #000000;
+  line-height: 1.6;
 }
 
-.footer-link {
+.footer-text span {
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
-  color: #000000;
+  color: inherit;
 }

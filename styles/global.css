@@ -1,0 +1,49 @@
+/* RESET + BASE */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: linear-gradient(90deg, #fff7ad, #ffa9f9);
+  min-height: 100vh;
+}
+
+/* GLOBAL LOGO (used on ALL pages) */
+.logo,
+.logo:link,
+.logo:visited,
+.logo:hover,
+.logo:active {
+  font-size: 24px;
+  font-weight: 800;
+  font-style: italic;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+
+  /* gradient text */
+  background: linear-gradient(90deg, #ff1fa9, #c084fc, #ffd166);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* glow */
+  text-shadow: 0 0 10px rgba(255, 31, 169, 0.2);
+}
+
+/* GLOBAL TOP BAR (if reused later) */
+.top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 28px;
+  background: #ffefb4;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
