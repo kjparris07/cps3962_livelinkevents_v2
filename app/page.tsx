@@ -54,12 +54,12 @@ export default function Home() {
         <br />
         STARTS HERE...
       </h1>
-      <h2 id="search">Search by:</h2>
 
-      <div className="container">
-
+      <div id="search">
+        <h2 className="search-title">Search by:</h2>
+        <div id="search-fields">
         <form onSubmit={handleSubmit((d) => handleSearch("state", d))} className="search-card">
-          <h3>Location</h3>
+          <label className="field-label">Location</label>
           <select {...register("state")} className="input-box">
             <option value="">Select a state</option>
             <option value="NJ">New Jersey</option>
@@ -70,17 +70,17 @@ export default function Home() {
         </form>
 
         <form onSubmit={handleSubmit((d) => handleSearch("date", d))} className="search-card">
-          <h3>Date</h3>
+          <label className="field-label">Date</label>
           <input type="date" {...register("date")} className="input-box" />
           <button className="babyButton">{loading ? "..." : ">"}</button>
         </form>
 
         <form onSubmit={handleSubmit((d) => handleSearch("artist", d))} className="search-card">
-          <h3>Artist</h3>
+          <label className="field-label">Artist</label>
           <input {...register("artist")} className="input-box" placeholder="Artist" />
           <button className="babyButton">{loading ? "..." : ">"}</button>
         </form>
-
+      </div>
       </div>
 
       {hasSearched && (
