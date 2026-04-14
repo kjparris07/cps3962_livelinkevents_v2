@@ -7,7 +7,6 @@
 
 .signin-page {
   min-height: 100vh;
-  background: linear-gradient(90deg, #fff7ad, #ffa9f9);
   display: flex;
   justify-content: center;
   align-items: flex-start;

@@ -1,120 +1,81 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import "../../styles/signin.css";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useCookies } from 'react-cookie';
+import { useRouter } from 'next/navigation';
+import { logIn } from '../actions';
+
+import "@/styles/signin.css";
+
+type SignInFormData = {
+  email: string;
+  password: string;
+};
 
 export default function LoginPage() {
   const router = useRouter();
-
-  const [emailOrUsername, setEmailOrUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [ _, setCookie ] = useCookies();
   const [loading, setLoading] = useState(false);
-
-  const handleLogin = () => {
-    setError("");
+  const { register, handleSubmit } = useForm<SignInFormData>();
+  
+  const onSubmit = async (data: SignInFormData) => {
     setLoading(true);
+    const fd = new FormData();
 
-    const savedUser = localStorage.getItem("livelinkUser");
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        fd.append(key, value);
+      }
+    });
 
-    if (!savedUser) {
-      setError("No account found. Please sign up first.");
-      setLoading(false);
-      return;
-    }
+    const result = await logIn(fd);
 
-    const parsedUser = JSON.parse(savedUser);
-
-    const matchesUser =
-      emailOrUsername === parsedUser.email ||
-      emailOrUsername === parsedUser.username;
-
-    const matchesPassword = password === parsedUser.password;
-
-    if (!matchesUser || !matchesPassword) {
-      setError("Invalid email/username or password.");
-      setLoading(false);
-      return;
-    }
-
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("loggedInUsername", parsedUser.username);
-    localStorage.setItem("loggedInEmail", parsedUser.email);
-    localStorage.setItem("loggedInRole", parsedUser.accountType || "customer");
-
-    setLoading(false);
-
-    if (parsedUser.accountType === "organizer") {
-      router.push("/account/organizer");
+    if (result.success) {
+      setCookie("email", data.email);
+      if (result.account_type == 'customer') {
+        router.push("/account/customer");
+      } else {
+        router.push("/account/organizer");
+      }
     } else {
-      router.push("/account/customer");
+      console.error(result)
     }
+    setLoading(false);
   };
 
   return (
-    <main className="signin-container">
-        <div className="top-bar">
-          <Link href="/" className="logo">
-            LiveLink Events
-          </Link>
-        </div>
+    <main className="login-page">
+      <form className="login-container" onSubmit={handleSubmit(onSubmit)}>
 
-        <div className="signin-title">SIGN IN</div>
+        <div className="login-title">LOG IN</div>
         <div className="required-note">* Indicates required field</div>
 
         <div className="input-group">
-          <label className="input-label" htmlFor="emailOrUsername">
-            Email or Username*
-          </label>
-          <input
-            id="emailOrUsername"
-            type="text"
-            className="input-box"
-            value={emailOrUsername}
-            onChange={(e) => setEmailOrUsername(e.target.value)}
-            placeholder="Enter your email or username"
-          />
+          <div className="input-label">Email*</div>
+          <input type="text" className="input-box" {...register("email", {required: true})}/>
         </div>
 
         <div className="input-group">
-          <label className="input-label" htmlFor="password">
-            Password*
-          </label>
-          <input
-            id="password"
-            type="password"
-            className="input-box"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-          />
+          <div className="input-label">Password*</div>
+          <input type="password" className="input-box" {...register("password", {required: true})}/>
         </div>
 
-        {error && (
-          <p style={{ color: "red", marginBottom: "15px" }}>{error}</p>
-        )}
-
         <div className="cta">
-          <button
-            type="button"
-            className="cta-btn"
-            onClick={handleLogin}
-            disabled={loading}
-          >
-            {loading ? "Signing In..." : "Sign In"}
+          <button className="cta-btn" disabled={ loading }>
+            { loading ? 'Logging In...' : 'Log In' }
           </button>
         </div>
 
         <div className="footer-text">
-          Don’t have an account?
+          Or
           <br />
-          <Link href="/signup">
-            <span>Sign Up</span>
-          </Link>
+          <a href="/signup" className="footer-link">
+            Sign Up
+          </a>
+          to create an account
         </div>
-      
+      </form>
     </main>
   );
 }

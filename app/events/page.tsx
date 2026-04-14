@@ -1,8 +1,10 @@
 import Link from "next/link";
 import "../../styles/main.css";
 import "../../styles/events.css";
+import { Results } from "../globalComponents/Results";
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  let results = await Results("all", new FormData);
   return (
     <main>
       <div className="top-bar">
@@ -17,7 +19,8 @@ export default function EventsPage() {
       </div>
 
       <div className="container">
-        <h1>ALL EVENTS</h1>
+        <h1 className="title">ALL EVENTS</h1>
+        {results}
       </div>
     </main>
   );

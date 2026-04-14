@@ -2,7 +2,6 @@
 import { query } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
-
 export async function hashPassword(password: string): Promise<string> {
     const saltRounds = 12; 
     
@@ -22,7 +21,8 @@ export async function logIn(formData: FormData) {
         const accounts = await query(
             `SELECT password
             FROM users
-            WHERE email=$1;`, [`${email}`]);
+            WHERE email=$1;`, [`${email}`]
+        );
 
         if (accounts.rows.length == 0) {
             return { success: false, error: "No account found." };
@@ -32,13 +32,47 @@ export async function logIn(formData: FormData) {
             return { success: false, error: "Multiple accounts found." };
         }
         
-        const isValid = await verifyPassword(password, accounts.rows[0]);
+        const isValid = await verifyPassword(password, accounts.rows[0].password);
         if (isValid) {
-            return { success: true }; 
+            try {
+                const customers = await query(
+                    `SELECT email
+                    FROM customers
+                    WHERE email=$1`, [`${email}`]
+                );
+
+                if (customers.rows.length == 0) {
+                    try {
+                        const organizers = await query(
+                            `SELECT email
+                            FROM organizers
+                            WHERE email=$1`, [`${email}`]
+                        );
+                        if (organizers.rows.length == 0) {
+                            return { success: false, error: "Account found without type."};
+                        }
+
+                        if (organizers.rows.length > 1) {
+                            return { success: false, error: "Multiple organizer accounts found."};
+                        }
+                        return { success: true, account_type: "organizer"};
+                    } catch (error) {
+                        return { success: false, error: "Account found, error checking account type."};
+                    }
+                }
+
+                if (customers.rows.length > 1) {
+                    return { success: false, error: "Multiple customer accounts found."};
+                }
+                return { success: true, account_type: "customer"};
+            } catch (error) {
+                return { success: false, error: "Account found, error checking account type."}
+            }
         } else {
             return { success: false, error: "Invalid credentials." };
         }
     } catch (error) {
+        console.error(error);
         return { success: false, error: "Error checking database." };
     }
 }
@@ -47,11 +81,10 @@ export async function createAccount(formData: FormData) {
     const email = formData.get('email') as string;
 
     try {
-        console.log("HELLO WORLD");
         const accounts = await query(
             `SELECT email 
             FROM users 
-            WHERE email=$1;`, [`${email}`]);
+            WHERE email=$1`, [`${email}`]);
         
         if (accounts.rows.length > 0) {
             return { success: false, error: "User already exists."};
@@ -103,6 +136,54 @@ export async function createAccount(formData: FormData) {
         }
     } catch (error) {
         return { success: false, error: "Error checking database."};
+    }
+}
+
+export async function deleteAccount(email:string) {
+    console.log(`DELETE ACCOUNT ${email}`);
+    console.log("Not implemented yet.");
+}
+
+export async function getAccountInfo(account_type:string, email: string) {
+    if (account_type === "customer") {
+        try {
+            const result = await query(
+                `SELECT *
+                FROM customers
+                WHERE email=$1`, [`${email}`]
+            );
+
+            if (result.rows.length == 0) {
+                return { success: false, error: "Customer info not found."};
+            }
+
+            if (result.rows.length > 1) {
+                return { success: false, error: "Multiple customers found."};
+            }
+            return { success: true, info: result.rows[0]};
+        } catch (error) {
+            return { success: false, error: "Error fetching customer info."};
+        }
+    } else if (account_type === "organizer") {
+        try {
+            const result = await query(
+                `SELECT *
+                FROM organizers
+                WHERE email=$1`, [`${email}`]
+            );
+            if (result.rows.length == 0) {
+                return { success: false, error: "Organizer info not found."};
+            }
+
+            if (result.rows.length > 1) {
+                return { success: false, error: "Multiple organizers found."};
+            }
+            return { success: true, info: JSON.stringify(result.rows[0])};
+        } catch (error) {
+            return { success: false, error: "Error fetching organizer info."};
+        }
+    } else {
+        return { success: false, error: "Invalid account type."};
     }
 }
 

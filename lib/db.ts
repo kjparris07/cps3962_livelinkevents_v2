@@ -12,8 +12,9 @@ const pool = new Pool({
     rejectUnauthorized: false,
     ca: caCert
   },
-  idleTimeoutMillis: 0,
-  max: 3
+  max: 3,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000
 });
 
 export const query = (text: string, params?: any[]) => pool.query(text, params);

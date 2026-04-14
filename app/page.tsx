@@ -4,20 +4,16 @@ import { useState } from 'react';
 import { useForm, SubmitHandler } from "react-hook-form";
 import Link from "next/link";
 
-import { searchArtists, searchStates, searchDates } from '@/app/actions';
 import { Results } from './globalComponents/Results';
 
 import "../styles/main.css";
 
-type ArtistFormData = { artist: string };
-type StateFormData = { state: string };
-type DateFormData = { date: string };
-
 export default function Home() {
   const { register, handleSubmit } = useForm<any>();
-  const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+
+  let results = <></>;
 
   const handleSearch = async (type: string, data: any) => {
     setLoading(true);
@@ -28,27 +24,13 @@ export default function Home() {
       fd.append(key, value as string);
     });
 
-    let events = [];
-
-    if (type === "artist") events = await searchArtists(fd);
-    if (type === "state") events = await searchStates(fd);
-    if (type === "date") events = await searchDates(fd);
-
-    setResults(events);
+    results = await Results(type, fd);
     setLoading(false);
+
   };
 
   return (
     <main>
-      <div className="top-bar">
-        <Link href="/" className="logo">LiveLink Events</Link>
-
-        <Link href="/login" className="avatar-hover">
-          <span className="avatar-circle">👤</span>
-          <span className="avatar-label">Sign Up / Log In</span>
-        </Link>
-      </div>
-
       <h1 id="tagline">
         YOUR NEXT CONCERT EXPERIENCE
         <br />
@@ -60,7 +42,7 @@ export default function Home() {
         <div id="search-fields">
         <form onSubmit={handleSubmit((d) => handleSearch("state", d))} className="search-card">
           <label className="field-label">Location</label>
-          <select {...register("state")} className="input-box">
+          <select {...register("state")} className="input-box" required>
             <option value="">Select a state</option>
             <option value="NJ">New Jersey</option>
             <option value="NY">New York</option>
@@ -71,23 +53,24 @@ export default function Home() {
 
         <form onSubmit={handleSubmit((d) => handleSearch("date", d))} className="search-card">
           <label className="field-label">Date</label>
-          <input type="date" {...register("date")} className="input-box" />
+          <input type="date" {...register("date")} className="input-box" required />
           <button className="babyButton">{loading ? "..." : ">"}</button>
         </form>
 
         <form onSubmit={handleSubmit((d) => handleSearch("artist", d))} className="search-card">
           <label className="field-label">Artist</label>
-          <input {...register("artist")} className="input-box" placeholder="Artist" />
+          <input {...register("artist")} className="input-box" placeholder="Artist" required />
           <button className="babyButton">{loading ? "..." : ">"}</button>
         </form>
       </div>
       </div>
 
-      {hasSearched && (
+      {hasSearched ? (
         <div id="results">
-          <Results results={results} />
+          {results}
         </div>
-      )}
+      ) : 
+      <></>}
 
       <div className="action-row">
         <Link href="/events" className="view-events-btn">

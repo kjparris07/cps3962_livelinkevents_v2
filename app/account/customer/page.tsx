@@ -1,88 +1,75 @@
-"use client";
+"use client"
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 import "../../../styles/main.css";
 import "../../../styles/signin.css";
 import "../../../styles/account.css";
+import { getAccountInfo } from "@/app/actions";
+import { useEffect, useState } from "react"; // Added useState
 
-type UserData = {
-  fullName?: string;
-  email?: string;
-  username?: string;
-  phoneNumber?: string;
-  membershipPlan?: string;
-  favoriteGenre?: string;
-  favoriteArtist?: string;
-  favoriteCity?: string;
-  ticketAlerts?: boolean;
-  marketingEmails?: boolean;
-  profilePrivate?: boolean;
+type CustomerDBInfo = {
+    fName: string;
+    lName: string;
+    dob: Date;
+    date_reg: Date;
+    email: string;
+    state?: string;
+    phone?: string;
+    plan?: string;
+    genre?: string;
+    artist?: string;
+    alerts?: boolean;
+    emails?: boolean;
+    private?: boolean;
 };
 
 export default function CustomerAccountPage() {
-  const [user, setUser] = useState<UserData>({
-    fullName: "",
-    email: "",
-    username: "",
-    phoneNumber: "",
-    membershipPlan: "Basic Free Membership",
-    favoriteGenre: "Pop",
-    favoriteArtist: "None selected",
-    favoriteCity: "New York, NY",
-    ticketAlerts: true,
-    marketingEmails: true,
-    profilePrivate: false,
-  });
+    const [cookies] = useCookies(["email"]);
+    
+    const [customer, setCustomerData] = useState<CustomerDBInfo | null>(null);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem("livelinkUser");
+    useEffect(() => {
+      const fetchInfo = async () => {
+        console.log("Cookie Check:", cookies.email);
+        
+        if (cookies.email) {
+          try {
+            const db_info = await getAccountInfo("customer", cookies.email);
+            console.log("DB Response:", db_info);
 
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      setUser({
-        fullName: parsedUser.fullName || "",
-        email: parsedUser.email || "",
-        username: parsedUser.username || "",
-        phoneNumber: parsedUser.phoneNumber || "Not added",
-        membershipPlan: parsedUser.membershipPlan || "Basic Free Membership",
-        favoriteGenre: parsedUser.favoriteGenre || "Pop",
-        favoriteArtist: parsedUser.favoriteArtist || "None selected",
-        favoriteCity: parsedUser.favoriteCity || "New York, NY",
-        ticketAlerts:
-          parsedUser.ticketAlerts !== undefined ? parsedUser.ticketAlerts : true,
-        marketingEmails:
-          parsedUser.marketingEmails !== undefined
-            ? parsedUser.marketingEmails
-            : true,
-        profilePrivate:
-          parsedUser.profilePrivate !== undefined
-            ? parsedUser.profilePrivate
-            : false,
-      });
-    }
-  }, []);
+            if (db_info.success) {
+              const info = db_info.info;
+              setCustomerData({
+                fName: info.first_name,
+                lName: info.last_name,
+                dob: new Date(JSON.stringify(info.dob)),
+                date_reg: new Date(JSON.stringify(info.date_registered)),
+                email: info.email
+              });
+            }
+          } catch (err) {
+            console.error("Fetch error:", err);
+          }
+        }
+        setLoading(false);
+    };
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("loggedInUsername");
-    localStorage.removeItem("loggedInEmail");
-    window.location.href = "/login";
-  };
+    fetchInfo();
+  }, [cookies.email]);
+
+  if (loading) return <div className="account-page">Loading...</div>;
+  
+  if (!customer) return <div className="account-page">No account info found.</div>;
 
   return (
     <main className="account-page">
-      <div className="top-bar">
-        <Link href="/" className="logo">
-          LiveLink Events
-        </Link>
-      </div>
-
       <section className="account-wrapper">
         <div className="account-header">
           <p className="account-subheading">My Account</p>
           <h1 className="account-title-main">
-            Welcome back{user.username ? `, ${user.username}` : ""}!
+            Welcome back{customer.fName ? `, ${customer.fName}` : ""}!
           </h1>
           <p className="account-description">
             Manage your profile, tickets, membership, and preferences all in one
@@ -94,16 +81,13 @@ export default function CustomerAccountPage() {
           <div className="account-card">
             <h2>Profile Information</h2>
             <p>
-              <strong>Full Name:</strong> {user.fullName || "Not added"}
+              <strong>Full Name:</strong> {customer.fName + ' ' + customer.lName || "Not added"}
             </p>
             <p>
-              <strong>Email:</strong> {user.email || "Not added"}
+              <strong>Email:</strong> {customer.email || "Not added"}
             </p>
             <p>
-              <strong>Username:</strong> {user.username || "Not added"}
-            </p>
-            <p>
-              <strong>Phone Number:</strong> {user.phoneNumber || "Not added"}
+              <strong>Phone Number:</strong> {customer.phone || "Not added"}
             </p>
 
             <div className="account-card-actions">
@@ -116,7 +100,7 @@ export default function CustomerAccountPage() {
           <div className="account-card">
             <h2>Membership</h2>
             <p>
-              <strong>Current Plan:</strong> {user.membershipPlan}
+              <strong>Current Plan:</strong> {customer.plan || "Basic Free Plan"}
             </p>
             <p>
               Enjoy early access opportunities, event alerts, and account tools
@@ -155,13 +139,13 @@ export default function CustomerAccountPage() {
           <div className="account-card">
             <h2>Saved Preferences</h2>
             <p>
-              <strong>Favorite Genre:</strong> {user.favoriteGenre}
+              <strong>Favorite Genre:</strong> {customer.genre || "Not Added"}
             </p>
             <p>
-              <strong>Favorite Artist:</strong> {user.favoriteArtist}
+              <strong>Favorite Artist:</strong> {customer.artist || "Not Added"}
             </p>
             <p>
-              <strong>Preferred City:</strong> {user.favoriteCity}
+              <strong>Preferred State:</strong> {customer.state || "Not Added"}
             </p>
 
             <div className="account-card-actions">
@@ -175,15 +159,15 @@ export default function CustomerAccountPage() {
             <h2>Notifications & Privacy</h2>
             <p>
               <strong>Ticket Alerts:</strong>{" "}
-              {user.ticketAlerts ? "Enabled" : "Disabled"}
+              {customer.alerts ? "Enabled" : "Disabled"}
             </p>
             <p>
               <strong>Marketing Emails:</strong>{" "}
-              {user.marketingEmails ? "Enabled" : "Disabled"}
+              {customer.emails ? "Enabled" : "Disabled"}
             </p>
             <p>
               <strong>Profile Visibility:</strong>{" "}
-              {user.profilePrivate ? "Private" : "Public"}
+              {customer.private ? "Private" : "Public"}
             </p>
 
             <div className="account-card-actions">
@@ -208,14 +192,6 @@ export default function CustomerAccountPage() {
               >
                 Delete Account
               </Link>
-
-              <button
-                type="button"
-                className="account-primary-btn"
-                onClick={handleLogout}
-              >
-                Log Out
-              </button>
             </div>
           </div>
         </div>
