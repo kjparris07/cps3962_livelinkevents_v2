@@ -34,7 +34,7 @@ export default function CustomerPage() {
                   </div>
                 }));
               } else {
-                setEvents([<p key='no-results'>No events found. Try creating one!</p>]);
+                setEvents([<p key='no-results'>No events found. Try purchasing a ticket!</p>]);
               }
             }
           } else {

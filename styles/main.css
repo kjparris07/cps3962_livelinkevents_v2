@@ -363,3 +363,13 @@ select.input-box {
   flex-direction: row;
   justify-content: space-evenly;
 }
+
+.delete-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+}
+
+.delete-container > * {
+  margin-bottom: 20px;
+}

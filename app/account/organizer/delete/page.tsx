@@ -1,57 +1,51 @@
-'use client'
+'use client';
 
-import Link from "next/link";
+import { useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { useRouter } from 'next/navigation';
+import { deleteAccount } from '@/app/actions';
+
 import "@/styles/main.css";
-import "@/styles/signin.css";
+import "@/styles/account.css";
 
-import { deleteAccount } from "@/app/actions";
-import { useCookies } from "react-cookie";
-import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-export default function DeleteOrganizer() {
+export default function DeleteOrganizerPage() {
+  const [cookies, , removeCookie] = useCookies();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
   const router = useRouter();
-  const [ cookies, , removeCookie ] = useCookies();
-  const { handleSubmit } = useForm();
-  const [ loading, setLoading ] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
-  const isLoggedIn = mounted ? cookies.email : null;
-
-  const onSubmit = async () => {
+  async function handleDelete() {
     setLoading(true);
-    const deletion = await deleteAccount(cookies.email, "organizer");
-    if (deletion.success) {
-      removeCookie("email");
-      removeCookie("accountType");
-      router.push("/");
-    } else {
-      console.error("Something went wrong...", deletion.error);
+    setMessage('');
+
+    if (cookies.email) {
+      try {
+        const result = await deleteAccount(cookies.email, "organizer");
+        if (result.success) {
+          removeCookie("email", {path: "/"});
+          removeCookie("accountType", {path: "/"});
+          router.push("/");
+        } else {
+          throw Error("Could not delete from database.");
+        }
+      } catch (error) {
+        console.error(error);
+        setMessage('Something went wrong deleting organizer account.');
+      } finally {
+        setLoading(false);
+      }
     }
-    setLoading(false)
+    
   }
 
-  if (!isLoggedIn) return <h1 className="title">Please log in if you would like to delete your account.</h1>
-
   return (
-    <main className="login-page">
-
-      <form className="login-container" onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="login-title">DELETE ORGANIZER ACCOUNT</h1>
-
-        <p className="required-note">
-          This action cannot be undone.
-        </p>
-
-        <div className="cta">
-          <button className="view-events-btn" disabled={loading}>{loading ? "Loading..." : "Confirm Deletion"}</button>
-        </div>
-      </form>
+    <main className='container delete-container'>
+      <h1>Delete Organizer Account</h1>
+      <p>Are you sure you want to delete your organizer account?</p>
+      <button className='account-primary-btn' onClick={handleDelete} disabled={loading}>
+        {loading ? 'Deleting...' : 'Delete Account'}
+      </button>
+      {message && <p>{message}</p>}
     </main>
   );
 }
