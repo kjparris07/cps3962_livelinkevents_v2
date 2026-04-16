@@ -2,99 +2,65 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import "../../../styles/main.css";
-import "../../../styles/signin.css";
-import "../../../styles/account.css";
+import { useCookies } from "react-cookie";
+import { getAccountInfo, setOrganizer, getOrganizerEvents } from "@/app/actions";
+import { OrganizerDBInfo } from "@/app/globalComponents/OrganizerDBInfo";
+import "@/styles/main.css";
+import "@/styles/signin.css";
+import "@/styles/account.css";
 
-type OrganizerData = {
-  fullName?: string;
-  email?: string;
-  username?: string;
-  phoneNumber?: string;
-  organizationType?: string;
-  website?: string;
-  instagramHandle?: string;
-  artistGenre?: string;
-  verifiedOrganizer?: boolean;
-  eventsPublished?: number;
-  monthlySales?: string;
-  payoutMethod?: string;
-  marketingEmails?: boolean;
-  twoFactorEnabled?: boolean;
-};
 
 export default function OrganizerAccountPage() {
-  const [organizer, setOrganizer] = useState<OrganizerData>({
-    fullName: "",
-    email: "",
-    username: "",
-    phoneNumber: "",
-    organizationType: "Artist / Organizer",
-    website: "Not added",
-    instagramHandle: "Not added",
-    artistGenre: "Not added",
-    verifiedOrganizer: false,
-    eventsPublished: 0,
-    monthlySales: "$0.00",
-    payoutMethod: "Not added",
-    marketingEmails: true,
-    twoFactorEnabled: false,
-  });
+  const [cookies] = useCookies();   
+  const [organizer, setOrganizerData] = useState<OrganizerDBInfo | null>(null);
+  const [events, setEvents] = useState<any[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("livelinkUser");
-
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      setOrganizer({
-        fullName: parsedUser.fullName || "",
-        email: parsedUser.email || "",
-        username: parsedUser.username || "",
-        phoneNumber: parsedUser.phoneNumber || "Not added",
-        organizationType: parsedUser.organizationType || "Artist / Organizer",
-        website: parsedUser.website || "Not added",
-        instagramHandle: parsedUser.instagramHandle || "Not added",
-        artistGenre: parsedUser.artistGenre || "Not added",
-        verifiedOrganizer:
-          parsedUser.verifiedOrganizer !== undefined
-            ? parsedUser.verifiedOrganizer
-            : false,
-        eventsPublished: parsedUser.eventsPublished || 0,
-        monthlySales: parsedUser.monthlySales || "$0.00",
-        payoutMethod: parsedUser.payoutMethod || "Not added",
-        marketingEmails:
-          parsedUser.marketingEmails !== undefined
-            ? parsedUser.marketingEmails
-            : true,
-        twoFactorEnabled:
-          parsedUser.twoFactorEnabled !== undefined
-            ? parsedUser.twoFactorEnabled
-            : false,
-      });
+    const fetchInfo = async () => {
+    if (cookies.email) {
+      try {
+        const db_info = await getAccountInfo("organizer", cookies.email);
+        if (db_info.success) {
+          setOrganizerData(await setOrganizer(db_info.info));
+          const org_events = await getOrganizerEvents(cookies.email);
+          if (org_events.success) {
+            const results = org_events.data;
+            if (results && results.length > 0) {
+              setEvents(results.map((event) => (
+                <div key={event.event_id} className="event-info">
+                  <h3 className="event-date">{event.event_date.toLocaleDateString()} — {event.event_title}</h3>
+                  <h4 className="event-artist">{event.artist_name}</h4>
+                  <h5 className="event-location">{event.venue_city}, {event.venue_state}</h5>
+                </div>
+              )));
+            } else {
+              setEvents([<p key='no-results'>No events found. Try creating one!</p>]);
+            }
+          }
+        } 
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
     }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("loggedInUsername");
-    localStorage.removeItem("loggedInEmail");
-    localStorage.removeItem("loggedInRole");
-    window.location.href = "/login";
+    setLoading(false);
   };
+  
+  fetchInfo();
+  }, [cookies.email]);
+
+  if (loading) return <div className="account-page">Loading...</div>;
+  
+  if (!organizer) return <div className="account-page">No account info found.</div>;
 
   return (
     <main className="account-page">
-      <div className="top-bar">
-        <Link href="/" className="logo">
-          LiveLink Events
-        </Link>
-      </div>
 
       <section className="account-wrapper">
         <div className="account-header">
           <p className="account-subheading">Organizer Dashboard</p>
           <h1 className="account-title-main">
-            Welcome back{organizer.username ? `, ${organizer.username}` : ""}!
+            Welcome back{organizer.name ? `, ${organizer.name}` : ""}!
           </h1>
           <p className="account-description">
             Manage your artist or company profile, event listings, media, sales,
@@ -106,19 +72,16 @@ export default function OrganizerAccountPage() {
           <div className="account-card">
             <h2>Organizer Profile</h2>
             <p>
-              <strong>Name:</strong> {organizer.fullName || "Not added"}
+              <strong>Name:</strong> {organizer.name || "Not added"}
             </p>
             <p>
               <strong>Email:</strong> {organizer.email || "Not added"}
             </p>
             <p>
-              <strong>Username:</strong> {organizer.username || "Not added"}
+              <strong>Business Phone:</strong> {organizer.phone || "Not added"}
             </p>
             <p>
-              <strong>Business Phone:</strong> {organizer.phoneNumber || "Not added"}
-            </p>
-            <p>
-              <strong>Role Type:</strong> {organizer.organizationType}
+              <strong>Role Type:</strong> {organizer.role}
             </p>
 
             <div className="account-card-actions">
@@ -131,14 +94,10 @@ export default function OrganizerAccountPage() {
           <div className="account-card">
             <h2>Organizer Status</h2>
             <p>
-              <strong>Verification:</strong>{" "}
-              {organizer.verifiedOrganizer ? "Verified" : "Pending Verification"}
-            </p>
-            <p>
               <strong>Payout Method:</strong> {organizer.payoutMethod}
             </p>
             <p>
-              <strong>Monthly Sales:</strong> {organizer.monthlySales}
+              <strong>Monthly Sales:</strong> ${2412.89}
             </p>
 
             <div className="account-card-actions">
@@ -148,9 +107,8 @@ export default function OrganizerAccountPage() {
 
           <div className="account-card">
             <h2>Event Management</h2>
-            <p>
-              <strong>Published Events:</strong> {organizer.eventsPublished}
-            </p>
+            <h3>Upcoming Events:</h3>
+            {events}
             <p>
               Create, edit, and manage ticketed events listed through LiveLink.
             </p>
@@ -167,10 +125,10 @@ export default function OrganizerAccountPage() {
               <strong>Website:</strong> {organizer.website}
             </p>
             <p>
-              <strong>Instagram:</strong> {organizer.instagramHandle}
+              <strong>Instagram:</strong> {organizer.instagram}
             </p>
             <p>
-              <strong>Primary Genre:</strong> {organizer.artistGenre}
+              <strong>Primary Genre:</strong> {organizer.genre}
             </p>
 
             <div className="account-card-actions stacked-actions">
@@ -214,14 +172,6 @@ export default function OrganizerAccountPage() {
               >
                 Delete Organizer Account
               </Link>
-
-              <button
-                type="button"
-                className="account-primary-btn"
-                onClick={handleLogout}
-              >
-                Log Out
-              </button>
             </div>
           </div>
         </div>

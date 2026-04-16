@@ -1,4 +1,3 @@
-import { CustomerDBInfo } from "./CustomerDBInfo";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,7 +14,7 @@ export default function EditForm({customer}:{[key:string]:any}) {
     if (customer && customer.email) {
       setLoading(true);
       const fd = new FormData();
-      const booleanFields = ["emails", "alerts", "private", "events"];
+      const booleanFields = ["emails", "alerts", "private"];
 
       Object.entries(data).forEach(([key, value]) => {
         if (!(key in dirtyFields)) return;
@@ -32,7 +31,7 @@ export default function EditForm({customer}:{[key:string]:any}) {
         return;
       }
 
-      const outcome = await updateAccount(customer.email, fd);
+      const outcome = await updateAccount("customer", customer.email, fd);
       setLoading(false);
 
       if (outcome?.success) {

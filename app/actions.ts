@@ -101,12 +101,14 @@ export async function createAccount(formData: FormData) {
                 VALUES (default, $1, $2);`,
                 [`${email}`, `${hashedPassword}`]
             );
+            
             const id_result = await query(
                 `SELECT id
                 FROM users
                 WHERE email=$1`,
                 [`${email}`]
             );
+
             const user_id = parseInt(id_result.rows[0].id);
 
             if (accountType == "customer") {
@@ -120,9 +122,9 @@ export async function createAccount(formData: FormData) {
                     [`${email}`, `${fName}`, `${lName}`, `${dob}`, user_id]
                 );
             } else {
-                const phone = formData.get('phone') as string;
-                const name = formData.get('name') as string;
-                const company = formData.get('company') as string;
+                const phone = formData.get('phone');
+                const name = formData.get('name');
+                const company = formData.get('company');
 
                 await query(
                     `INSERT INTO organizers
@@ -139,7 +141,7 @@ export async function createAccount(formData: FormData) {
     }
 }
 
-export async function updateAccount(email: string, formData: FormData) {
+export async function updateAccount(account_type: "customer" | "organizer", email: string, formData: FormData) {
     
     try {
         let setClauses:string[] = [];
@@ -154,7 +156,13 @@ export async function updateAccount(email: string, formData: FormData) {
         const setQuery = setClauses.join(', ');
         values.push(email);
 
-        const finalQuery = `UPDATE customers SET ${setQuery} WHERE email = $${i} RETURNING *`;
+        let finalQuery = "";
+
+        if (account_type === "customer") {
+            finalQuery = `UPDATE customers SET ${setQuery} WHERE email = $${i} RETURNING *`;
+        } else if (account_type === "organizer") {
+            finalQuery = `UPDATE organizers SET ${setQuery} WHERE email = $${i} RETURNING *`;
+        }
 
         const result = await query(finalQuery, values);
 
@@ -190,9 +198,82 @@ export async function setCustomer(info: any) {
     };
 }
 
-export async function deleteAccount(email:string) {
-    console.log(`DELETE ACCOUNT ${email}`);
-    console.log("Not implemented yet.");
+export async function setOrganizer(info: any) {
+    return {
+        name: info.name,
+        email: info.email,
+        phone: info.phone,
+        genre: info.genre,
+        role: info.role,
+        website: info.website,
+        instagram: info.instagram,
+        company: info.organization,
+        payoutMethod: info.payout_method,
+        events: info.events
+    };
+}
+
+export async function deleteAccount(email:string, account_type: "customer" | "organizer") {
+    try {
+        let result = null;
+        if (account_type == "customer") {
+            result = await query(
+                `SELECT id
+                FROM customers
+                WHERE email=$1`, [`${email}`]
+            );
+        
+        } else if (account_type == "organizer") {
+            result = await query(
+                `SELECT id
+                FROM organizers
+                WHERE email=$1`, [`${email}`]
+            );
+        } else {
+            return { success: false, error: "Invalid account type." };
+        }
+        if (result) {
+            if (result.rows.length === 0) {
+                return { success: false, error: "User not found." };
+            } else if (result.rows.length > 1) {
+                return { success: false, error: "Multiple users found." };
+            } else {
+                try {
+                    const id = result.rows[0].id;
+
+                    if (account_type === "customer") {
+                        await query(
+                            `DELETE
+                            FROM customers
+                            WHERE id=$1`, [`${id}`]
+                        );
+                    } else {
+                        await query(
+                            `DELETE
+                            FROM organizers
+                            WHERE id=$1`, [`${id}`]
+                        );
+                    }
+
+                    await query(
+                        `DELETE
+                        FROM users
+                        WHERE id=$1`, [`${id}`]
+                    );
+
+                    return { success: true };
+                } catch (error) {
+                    return { success: false, error: "Could not remove user from database." }
+                }
+            }
+        } else {
+            return { success: false, error: "Query unsuccessful." };
+        }
+        
+    } catch (error) {
+        console.error("Something went wrong...", error);
+        return { success: false, error: error };
+    }
 }
 
 export async function getAccountInfo(account_type:string, email: string) {
@@ -230,7 +311,7 @@ export async function getAccountInfo(account_type:string, email: string) {
             if (result.rows.length > 1) {
                 return { success: false, error: "Multiple organizers found."};
             }
-            return { success: true, info: JSON.stringify(result.rows[0])};
+            return { success: true, info: result.rows[0]};
         } catch (error) {
             return { success: false, error: "Error fetching organizer info."};
         }
@@ -266,6 +347,41 @@ export async function getCustomerEvents(email: string) {
             JOIN customer_events c ON e.event_id = c.event_id
             WHERE now() < e.date AND c.customer_id=$1
             ORDER BY e.date ASC;`, [`${customerId}`]
+        );
+        return { success: true, data: result.rows};
+    } catch (error) {
+        console.error('Database Error:', error);
+        return { success: false, error: error};
+    }
+}
+
+export async function getOrganizerEvents(email: string) {
+    try {
+        const organizerId = (await query(
+            `SELECT id
+            FROM organizers
+            WHERE email=$1`, [`${email}`]
+        )).rows[0].id;
+        const result = await query(
+            `SELECT 
+                e.event_id AS event_id,
+                e.name AS event_title,
+                e.date AS event_date,
+                e.category AS event_category,
+                a.name AS artist_name,
+                a.image AS artist_image,
+                a.genre AS artist_genre,
+                v.name AS venue_name,
+                v.city AS venue_city,
+                v.state AS venue_state,
+                o.organization AS organized_by
+            FROM events e
+            JOIN artists a ON e.artist_id = a.artist_id
+            JOIN venues v ON e.venue_id = v.venue_id
+            JOIN organizers o ON e.organizer_id = o.id
+            JOIN organizer_events g ON e.event_id = g.event_id
+            WHERE now() < e.date AND g.organizer_id=$1
+            ORDER BY e.date ASC;`, [`${organizerId}`]
         );
         return { success: true, data: result.rows};
     } catch (error) {

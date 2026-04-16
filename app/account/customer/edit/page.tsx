@@ -5,7 +5,7 @@ import { useCookies } from "react-cookie";
 import { getAccountInfo } from "@/app/actions";
 import { setCustomer } from "@/app/actions";
 import { CustomerDBInfo } from "@/app/globalComponents/CustomerDBInfo";
-import EditForm from "@/app/globalComponents/EditForm";
+import EditForm from "@/app/account/customer/edit/EditForm";
 
 import "@/styles/main.css";
 import "@/styles/account.css";

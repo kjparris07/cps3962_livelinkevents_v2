@@ -38,7 +38,7 @@ export default function CustomerAccountPage() {
                     </div>
                   )));
                 } else {
-                  setEvents(["<p className='no-results'>No events found. Try buying a ticket!</p>"]);
+                  setEvents([<p key='no-results'>No events found. Try buying a ticket!</p>]);
                 }
               }
               

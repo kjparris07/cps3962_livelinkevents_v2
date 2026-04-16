@@ -2,8 +2,10 @@
 import Link from "next/link";
 import { useCookies } from "react-cookie";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginBar() {
+  const router = useRouter();
   const [cookies, , removeCookie] = useCookies();
   const [mounted, setMounted] = useState(false);
 
@@ -15,6 +17,8 @@ export default function LoginBar() {
 
   const submitLogout = () => {
     removeCookie("email");
+    removeCookie("accountType");
+    router.push("/");
   };
 
   return (
@@ -31,7 +35,7 @@ export default function LoginBar() {
         }}
       >
         <Link
-          href={isLoggedIn ? "/account/customer" : "/login"}
+          href={isLoggedIn ? `/account/${cookies.accountType}` : "/login"}
           className="avatar-hover"
         >
           <span className="avatar-circle">👤</span>

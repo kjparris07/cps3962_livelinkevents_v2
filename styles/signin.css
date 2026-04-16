@@ -67,7 +67,10 @@
 
 .input-group {
   text-align: left;
-  margin-bottom: 40px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  width: 375px;
 }
 
 .input-label {
@@ -75,10 +78,10 @@
   font-size: 16px;
   font-weight: 500;
   color: #131314;
-  margin-bottom: 6px;
+  text-align: center;
 }
 
-.input-box {
+input.input-box {
   width: 100%;
   padding: 12px 40px;
   border-radius: 12px;

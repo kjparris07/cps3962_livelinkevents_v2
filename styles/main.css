@@ -160,10 +160,8 @@ select {
 }
 
 select.input-box {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   width: 100%;
+  text-align: center;
 }
 
 

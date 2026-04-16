@@ -1,213 +1,157 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
-import "../../styles/signin.css";
+import { createAccount } from "@/app/actions";
+import "@/styles/signin.css";
+import "@/styles/main.css";
+
+type SignUpFormData = {
+  // shared fields
+  email: string;
+  account_type: 'customer' | 'organizer';
+  password: string;
+  confirmPassword: string;
+  // Customer ONLY fields
+  fName?: string;
+  lName?: string;
+  dob?: string;
+  // Organizer ONLY fields
+  name?: string;
+  phone?: string;
+  company?: string;
+};
 
 export default function SignupPage() {
   const router = useRouter();
+  const [ _, setCookie ] = useCookies();
+  const [loading, setLoading] = useState(false);
+  const { register, watch, handleSubmit } = useForm<SignUpFormData>({
+    defaultValues: {
+      account_type: 'customer'
+    }
+  });
+  const [error, setError ] = useState("");
 
-  const [accountType, setAccountType] = useState("customer");
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const accountType = watch('account_type');
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/;
   const passwordRegex = /^(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
 
-  const handleSubmit = () => {
+  const onSubmit = async (data: any) => {
     setError("");
-    setSuccessMessage("");
 
-    if (!fullName.trim()) {
-      setError("Full name is required.");
-      return;
-    }
-
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(data.email)) {
       setError("Please enter a valid email address.");
       return;
     }
 
-    if (!usernameRegex.test(username)) {
-      setError(
-        "Username must be 3 to 15 characters and can only use letters, numbers, or underscores."
-      );
-      return;
-    }
-
-    if (!passwordRegex.test(password)) {
+    if (!passwordRegex.test(data.password)) {
       setError(
         "Password must be at least 6 characters and include at least one number and one symbol."
       );
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (data.password !== data.confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
-    const newUser = {
-      accountType,
-      fullName,
-      email,
-      username,
-      password,
-      phoneNumber: "",
-      membershipPlan:
-        accountType === "customer" ? "Basic Free Membership" : "Organizer Plan",
-      favoriteGenre: "",
-      favoriteArtist: "",
-      favoriteCity: "",
-      profilePrivate: false,
-      marketingEmails: true,
-      ticketAlerts: true,
-      twoFactorEnabled: false,
-    };
+    setLoading(true);
+    const fd = new FormData();
 
-    localStorage.setItem("livelinkUser", JSON.stringify(newUser));
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("loggedInUsername", username);
-    localStorage.setItem("loggedInEmail", email);
-    localStorage.setItem("loggedInRole", accountType);
-
-    setSuccessMessage("Account created successfully.");
-
-    setTimeout(() => {
-      if (accountType === "organizer") {
-        router.push("/account/organizer");
-      } else {
-        router.push("/account/customer");
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "" && key !== "confirmPassword") {
+        fd.append(key, value.toString());
       }
-    }, 1000);
+    });
+
+    const result = await createAccount(fd);
+    if (result.success) {
+      setCookie("email", fd.get('email'));
+      if (accountType === "customer") {
+        setCookie("accountType", "customer");
+        router.push("/account/customer");
+      } else {
+        setCookie("accountType", "organizer");
+        router.push("/account/organizer");
+      }
+    } else {
+      console.error("Something went wrong...", result.error);
+    }
+    setLoading(false);
+
   };
 
   return (
-    <main className="signin-container">
-        <div className="top-bar">
-          <Link href="/" className="logo">
-            LiveLink Events
-          </Link>
-        </div>
+    <main className="signup-page">
+      <div className="signup-container container">
 
-        <div className="signin-title">SIGN UP</div>
-        <div className="required-note">* Indicates required field</div>
+        <form onSubmit={handleSubmit(onSubmit)} className="sign-up-form">
+          <div className='sign-up-title'>SIGN UP</div>
 
-        <div className="input-group">
-          <label className="input-label" htmlFor="accountType">
-            Account Type*
-          </label>
-          <select
-            id="accountType"
-            className="input-box"
-            value={accountType}
-            onChange={(e) => setAccountType(e.target.value)}
-          >
-            <option value="customer">Customer</option>
-            <option value="organizer">Organizer</option>
-          </select>
-        </div>
+          {/* Shared Fields */}
+          <div className="input-group">
+            <label className="input-label">Account Type:</label>
+            <select className="input-box" {...register("account_type")}>
+              <option value="customer">Customer</option>
+              <option value="organizer">Organizer</option>
+            </select>
+            <label className="input-label">Email:</label>
+            <input className="input-box" {...register("email", { required: true })} placeholder="Email" type="email" />
+            
+            <label className="input-label">Password:</label>
+            <input className="input-box" {...register("password", { required: true })} placeholder="Password" type="password" />
+            <input className="input-box" {...register("confirmPassword", { required: true })} placeholder="Confirm Password" type="password" />
+          </div>
 
-        <div className="input-group">
-          <label className="input-label" htmlFor="fullName">
-            {accountType === "organizer" ? "Organizer Name*" : "Full Name*"}
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            className="input-box"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Enter your name"
-          />
-        </div>
+          {/* Conditional Fields for CUSTOMER */}
+          {accountType === 'customer' && (
+            <div className="dynamic-fields input-group">
+              <label className="input-label">First Name:</label>
+              <input className="input-box" {...register("fName", { required: true })} placeholder="First Name" />
 
-        <div className="input-group">
-          <label className="input-label" htmlFor="email">
-            Email*
-          </label>
-          <input
-            id="email"
-            type="email"
-            className="input-box"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your e-mail address"
-          />
-        </div>
+              <label className="input-label">Last Name:</label>
+              <input className="input-box" {...register("lName", { required: true })} placeholder="Last Name" />
+              
+              <label className="input-label">Date of Birth:</label>
+              <input className="input-box" {...register("dob", { required: true })} type="date" />
+            </div>
+          )}
 
-        <div className="input-group">
-          <label className="input-label" htmlFor="username">
-            Username*
-          </label>
-          <input
-            id="username"
-            type="text"
-            className="input-box"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
-          />
-        </div>
+          {/* Conditional Fields for ORGANIZER */}
+          {accountType === 'organizer' && (
+            <div className="dynamic-fields input-group">
+              <label className="input-label">Full Name:</label>
+              <input className="input-box" {...register("name", { required: true })} placeholder="Full Name" />
 
-        <div className="input-group">
-          <label className="input-label" htmlFor="password">
-            Password*
-          </label>
-          <input
-            id="password"
-            type="password"
-            className="input-box"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Type in your password"
-          />
-        </div>
+              <label className="input-label">Phone Number (10 digits):</label>
+              <input className="input-box" {...register("phone", { required: true })} placeholder="Phone (1234567890)" min={1000000000} maxLength={10} />
+              
+              <label className="input-label">Company Name:</label>
+              <input className="input-box" {...register("company", { required: true })} placeholder="Organization/Company Name" />
+            </div>
+          )}
 
-        <div className="input-group">
-          <label className="input-label" htmlFor="confirmPassword">
-            Confirm Password*
-          </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            className="input-box"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Type again your password"
-          />
-        </div>
+          {error && (
+            <p id="input-error" style={{ color: "red", marginBottom: "15px" }}>{error}</p>
+          )}
 
-        {error && (
-          <p style={{ color: "red", marginBottom: "15px" }}>{error}</p>
-        )}
-
-        {successMessage && (
-          <p style={{ color: "green", marginBottom: "15px" }}>
-            {successMessage}
-          </p>
-        )}
-
-        <div className="cta">
-          <button type="button" className="cta-btn" onClick={handleSubmit}>
-            Create Account
+          <button type="submit" className="cta-btn">
+            { loading ? "Loading..." : "Sign Up as " + accountType.toUpperCase() }
           </button>
-        </div>
+        </form>
 
         <div className="footer-text">
-          Already have an account?
-          <br />
-          <Link href="/login">
-            <span>Sign In</span>
-          </Link>
+          Already have an account? 
+          <a href="/login" className="footer-link">
+            {" "} Log In
+          </a>
         </div>
+      </div>
     </main>
   );
 }

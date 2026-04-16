@@ -34,8 +34,10 @@ export default function LoginPage() {
     if (result.success) {
       setCookie("email", data.email);
       if (result.account_type == 'customer') {
+        setCookie("accountType", "customer");
         router.push("/account/customer");
       } else {
+        setCookie("accountType", "organizer");
         router.push("/account/organizer");
       }
     } else {
@@ -68,12 +70,11 @@ export default function LoginPage() {
         </div>
 
         <div className="footer-text">
-          Or
-          <br />
+          Or{" "}
           <a href="/signup" className="footer-link">
             Sign Up
           </a>
-          to create an account
+          {" "}to create an account
         </div>
       </form>
     </main>
