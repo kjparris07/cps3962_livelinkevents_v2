@@ -34,7 +34,7 @@ export default function LoginPage() {
   if (result.success) {
     setCookie("email", data.email, { path: "/"});
     setCookie("accountType", data.account_type, { path: "/"});
-    router.push('/account');
+    router.push(`/account/${data.account_type}`);
   }
   setLoading(false);
   };
