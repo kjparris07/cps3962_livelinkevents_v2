@@ -1,15 +1,52 @@
-import { events } from "@/lib/events";
-import Link from "next/link";
-import "../../../../styles/main.css";
-import "../../../../styles/events.css";
+"use client"
 
-export default function TicketPaymentPage({ params }) {
-  const event = events.find((e) => e.id === params.id);
+import { Event } from "@/app/globalComponents/Event";
+import { Ticket } from "@/app/globalComponents/Ticket";
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { getEvent } from "@/app/actions";
+import Link from "next/link";
+import "@/styles/events.css";
+import "@/styles/main.css";
+import "@/styles/payment.css";
+
+type PageProps = {
+  params: Promise<{ id: string }>; 
+};
+
+export default function TicketPaymentPage({params}:PageProps) {
+  const [ event, setEvent ] = useState<Event>();
+  const {id} = React.use(params);
+  useEffect(() => {
+    const fetchEvent = async () => {
+      const result = await getEvent(id);
+      if (result.success) {
+        const rawDbString = result.result.tickets;
+        const ticketRegex = /\(\\\"\((\d+),([\d.]+)\)\\\",(\d+)\)/g;
+
+        const tickets: Ticket[] = [];
+        let match;
+
+        while ((match = ticketRegex.exec(rawDbString)) !== null) {
+          tickets.push({
+            tier: match[1], 
+            price: parseFloat(match[2]),
+            quantity: parseInt(match[3], 10),
+          });
+        }
+        result.result.tickets = tickets;
+        setEvent(result.result);
+      } else {
+        console.error(result.error);
+      }
+    }
+    fetchEvent();
+  }, []);
 
   if (!event) {
     return (
       <main className="container">
-        <h1>Event not found</h1>
+        <h1>Loading...</h1>
         <Link href="/events" className="view-events-btn">
           Back to all events
         </Link>
@@ -18,10 +55,11 @@ export default function TicketPaymentPage({ params }) {
   }
 
   return (
-    <main className="container">
-      <h1 className="title">Payment for {event.title}</h1>
-      <p>{event.location}</p>
-      <p>{event.date}</p>
+    <main className="payment-container ">
+
+      <h1 className="title">Payment for {event.event_title}</h1>
+      <p>{event.venue_city}, {event.venue_state}</p>
+      <p>{event.event_date.toDateString()}</p>
 
       <section className="ticket-section">
         <h2>Select Ticket Type</h2>
@@ -29,11 +67,11 @@ export default function TicketPaymentPage({ params }) {
           <label className="field-label">
             Ticket Option
             <select name="ticket" className="input-box">
-              {event.budget.map((option) => (
-                <option key={option.type} value={option.type}>
-                  {option.type} – ${option.price}
-                </option>
-              ))}
+              {event.tickets.map((option) => (
+              <option key={option.tier} className="ticketType" value={option.price} >
+                {option.tier == "1" ? "Basic" : option.tier == "2" ? "Premium" : "Elite"} – ${option.quantity > 0 ? option.price : "SOLD OUT"}
+              </option>
+            ))}
             </select>
           </label>
 
@@ -53,8 +91,8 @@ export default function TicketPaymentPage({ params }) {
           </label>
 
           <Link
-            href={`/events/${event.id}/confirmation`}
-            className="babyButton"
+            href={`/events/${event.event_id}/confirmation`}
+            className="view-events-btn"
             style={{ marginTop: "20px", display: "inline-block" }}
           >
             Complete Purchase

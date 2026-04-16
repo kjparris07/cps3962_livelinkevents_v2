@@ -11,7 +11,7 @@ export default function Home() {
   const { register, handleSubmit } = useForm<any>();
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [results, setResults] = useState<JSX.Element | null>(null);
+  const [results, setResults] = useState<any>(null);
 
   const handleSearch = async (type: string, data: any) => {
     setLoading(true);

@@ -390,6 +390,29 @@ export async function getOrganizerEvents(email: string) {
     }
 }
 
+export async function getEvent(event_id: string) {
+    try {
+        const result = await query(
+            `SELECT
+                e.event_id as event_id,
+                e.name as event_title,
+                a.name as artist_name,
+                a.image as artist_image,
+                e.date as event_date,
+                v.city as venue_city,
+                v.state as venue_state,
+                e.prices as tickets
+            FROM events e
+            JOIN artists a on e.artist_id = a.artist_id
+            JOIN venues v on e.venue_id = v.venue_id
+            WHERE e.event_id=cast($1 as bigint)`, [`${event_id}`]
+        );
+        return { success: true, result: result.rows[0]}
+    } catch (error) {
+        return { success: false, error: error};
+    }
+}
+
 export async function getAllEvents() {
     try {
         const result = await query(
@@ -404,7 +427,8 @@ export async function getAllEvents() {
                 v.name AS venue_name,
                 v.city AS venue_city,
                 v.state AS venue_state,
-                o.organization AS organized_by
+                o.organization AS organized_by,
+                e.prices AS tickets
             FROM events e
             JOIN artists a ON e.artist_id = a.artist_id
             JOIN venues v ON e.venue_id = v.venue_id

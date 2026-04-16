@@ -65,3 +65,81 @@
   margin-top: 20px;
   font-family: "Climate Crisis", sans-serif;
 }
+
+.artist-img {
+  width: 30vw;
+  height: auto;
+}
+
+.ticket-section > * {
+  margin: 10px auto;
+}
+
+h2 {
+  font-weight: 600;
+}
+
+.ticket-section ul {
+  list-style: none;
+}
+
+.ticket-section li {
+  text-align: center;
+}
+
+#email-input {
+  width: max-content;
+  height: 24px;
+  margin-left: 10px;
+}
+
+.notification-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-form .field-label {
+  font-weight: 500;
+  margin-top: 15px;
+}
+
+.checkbox-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.checkbox {
+  height: 100%;
+  margin: 0 0 0 7px;
+}
+
+.view-events-btn {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.secondary-btn {
+  background: #ffffff;
+  color: #ff1fa9;
+  border: 2px solid #ff1fa9;
+  width: 175px;
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 18px;
+  border: 3px solid #ff8ad8;
+  transition: transform 250ms ease, background 250ms ease;
+  margin: 60px auto;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  color: #ffffff;
+  background-color: #ff1fa9;
+}

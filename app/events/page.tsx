@@ -1,31 +1,62 @@
 "use client"
-import { events } from "@/lib/events";
+import { Event } from "@/app/globalComponents/Event";
+import { Ticket } from "../globalComponents/Ticket";
 import Link from "next/link";
 import "../../styles/main.css";
 import "../../styles/events.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getAllEvents } from "../actions";
 
 export default function EventsPage() {
   const [sortOption, setSortOption] = useState("default");
+  const [ events, setEvents ] = useState<Event[]>();
+  
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const results = await getAllEvents();
+      results.forEach((event) => {
+        const rawDbString = event.tickets;
+        const ticketRegex = /\(\\\"\((\d+),([\d.]+)\)\\\",(\d+)\)/g;
 
-  const sortedEvents = [...events].sort((a, b) => {
+        const tickets: Ticket[] = [];
+        let match;
+
+        while ((match = ticketRegex.exec(rawDbString)) !== null) {
+          tickets.push({
+            tier: match[1], 
+            price: parseFloat(match[2]),
+            quantity: parseInt(match[3], 10),
+          });
+        }
+        event.tickets = tickets;
+      });
+      setEvents(results);
+    }
+    fetchEvents();
+  }, []);
+
+  const sortedEvents = events?.sort((a, b) => {
     switch (sortOption) {
       case "az":
-        return a.title.localeCompare(b.title);
+        return a.event_title.localeCompare(b.event_title);
 
       case "date":
-        return new Date(a.date) - new Date(b.date);
+        return new Date(a.event_date).valueOf() - new Date(b.event_date).valueOf();
 
       case "priceLow":
-        return a.price - b.price;
+        return a.tickets[0].price - b.tickets[0].price;
 
       case "priceHigh":
-        return b.price - a.price;
-
-      default:
+        return a.tickets[a.tickets.length-1].price - b.tickets[b.tickets.length-1].price;
+      
+        default:
         return 0;
     }
   });
+
+  if (!events) {
+    return <h3>Finding events...</h3>;
+  }
 
  return (
     <main className="container">
@@ -46,33 +77,33 @@ export default function EventsPage() {
       </div>
 
       <section className="events-grid">
-        {sortedEvents.map((event) => (
-          <div key={event.id} className="event-card">
+        {sortedEvents?.map((event) => (
+          <div key={event.event_id} className="event-card">
             <div className="event-left">
-              <h2 className="event-title">{event.title}</h2>
+              <h2 className="event-title">{event.event_title}</h2>
 
               <p className="event-info">
-                <strong>Date:</strong> {event.date}
+                <strong>Date:</strong> {event.event_date.toDateString()}
               </p>
               <p className="event-info">
                 <strong>Time:</strong> 7:00 PM
               </p>
               <p className="event-info">
-                <strong>Location:</strong> {event.location}
+                <strong>Location:</strong> {event.venue_city}, {event.venue_state}
               </p>
               <p className="event-info">
-                <strong>Starting at:</strong> ${event.price}
+                <strong>Starting at:</strong> ${event.tickets[0].price}
               </p>
 
-              <Link href={`/events/${event.id}`} className="view-events-btn">
+              <Link href={`/events/${event.event_id}`} className="view-events-btn">
                 View Tickets
               </Link>
             </div>
 
             <div className="event-right">
               <img
-                src={`/artists/${event.id}.jpg`}
-                alt={event.title}
+                src={event.artist_image}
+                alt={event.event_title}
                 className="artist-image"
               />
             </div>

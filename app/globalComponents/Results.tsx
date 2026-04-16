@@ -1,51 +1,41 @@
-"use server";
+import { Event } from "@/app/globalComponents/Event";
+import { getAllEvents, searchArtists, searchDates, searchStates } from "../actions";
+export async function Results(type:string, fd: FormData):Promise<any> {
 
-import { events } from "@/lib/events";
-import Link from "next/link";
+  let results = [];
 
-export async function Results(type: string, formData: FormData) {
-  const artist = formData.get("artist")?.toString().toLowerCase() || "";
-  const location = formData.get("location")?.toString().toLowerCase() || "";
-  const date = formData.get("date")?.toString() || "";
-  const state = formData.get("state")?.toString().toLowerCase() || "";
-
-  const filtered = events.filter((event) => {
-    // FIX: event.title is the artist name
-    const matchesArtist = artist
-      ? event.title.toLowerCase().includes(artist)
-      : true;
-
-    const matchesLocation = location
-      ? event.location.toLowerCase().includes(location)
-      : true;
-
-    const matchesState = state
-      ? event.location.toLowerCase().includes(state)
-      : true;
-
-    const matchesDate = date ? event.date === date : true;
-
-    return matchesArtist && matchesLocation && matchesState && matchesDate;
-  });
-
-  if (filtered.length === 0) {
-    return (
-      <div className="no-results">
-        <h2>No events found</h2>
-        <p>Try adjusting your search filters.</p>
-      </div>
-    );
-  }
+  if (type === "artist") results = await searchArtists(fd);
+  if (type === "state") results = await searchStates(fd);
+  if (type === "date") results = await searchDates(fd);
 
   return (
-    <div className="events-list">
-      {filtered.map((event) => (
-        <Link key={event.id} href={`/events/${event.id}`} className="event-card">
-          <h3>{event.title}</h3>
-          <p>{event.location}</p>
-          <p>{event.date}</p>
-        </Link>
-      ))}
-    </div>
+    results.length > 0
+    ? 
+    results.map((event) => (
+      <div key={event.event_id} className="event-card">
+        {event.artist_image ? (
+          <img 
+            src={event.artist_image} 
+            alt={event.artist_name} 
+            className="artist-img" 
+          />
+        ) : (
+          <div className="artist-img-placeholder">
+            No Image
+          </div>
+        )}
+        <div className="event-info">
+          <h1 className="artist-name">{event.artist_name}</h1>
+          <h2 className="event-name">{event.event_title}</h2>
+          <h3 className="event-date">{event.event_date.toLocaleDateString()}</h3>
+          <h4 className="event-category">{event.event_category}</h4>
+          <h4 className="event-venue">{event.venue_name}</h4>
+          <p className="event-location">{event.venue_city}, {event.venue_state}</p>
+        </div>
+        <button className="purchase-tkt-btn">Purchase Tickets</button>
+      </div>
+    ))
+    :
+    <p className="no-results">No events found. Try another search!</p>
   );
 }

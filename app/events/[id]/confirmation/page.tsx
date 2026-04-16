@@ -1,18 +1,39 @@
-import { events } from "@/lib/events";
-import Link from "next/link";
-import "../../../../styles/main.css";
-import "../../../../styles/events.css";
+'use client'
 
-export default function ConfirmationPage({ params }) {
-  const event = events.find((e) => e.id === params.id);
+import Link from "next/link";
+import "@/styles/main.css";
+import "@/styles/events.css";
+import "@/styles/payment.css";
+
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { getEvent } from "@/app/actions";
+import { Event } from "@/app/globalComponents/Event";
+
+type PageProps = {
+  params: Promise<{ id: string }>; 
+};
+
+export default function ConfirmationPage({params}: PageProps) {
+  const [event, setEvent] = useState<Event>();
+  const {id} = React.use(params);
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      const result = await getEvent(id);
+      if (result.success) {
+        setEvent(result.result);
+      } else {
+        return(result.error);
+      }
+    }
+    fetchEvent();
+  }, [])
 
   if (!event) {
     return (
       <main className="container">
-        <h1>Event not found</h1>
-        <Link href="/events" className="view-events-btn">
-          Back to all events
-        </Link>
+        <h1>Processing...</h1>
       </main>
     );
   }
@@ -23,9 +44,9 @@ export default function ConfirmationPage({ params }) {
       <p>You’re all set for:</p>
 
       <section className="ticket-section">
-        <h2>{event.title}</h2>
-        <p>{event.location}</p>
-        <p>{event.date}</p>
+        <h2>{event.event_title}</h2>
+        <p>{event.venue_city}, {event.venue_state}</p>
+        <p>{event.event_date.toDateString()}</p>
       </section>
 
       <section className="ticket-section">
