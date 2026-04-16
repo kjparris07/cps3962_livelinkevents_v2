@@ -2,35 +2,40 @@
 
 import "@/styles/membershipPages.css";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCookies } from "react-cookie";
+import { useState, useEffect } from "react";
 import { membershipPlans} from "@/lib/memberships";
 
 export default function EliteMembershipPage() {
   const router = useRouter();
+  const [ cookies ] = useCookies();
+  const [ mounted, setMounted ] = useState(false);
+  const [name, setName] = useState("");
+  const [card, setCard] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvc, setCvc] = useState("");
+    
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
-  // Simulated login check
-  const isLoggedIn = true; // Replace with real auth later
-
+  const isLoggedIn = mounted ? cookies.email : null;
+  
   if (!isLoggedIn) {
     router.push("/login?plan=elite");
     return null;
   }
 
-  const [name, setName] = useState("");
-  const [card, setCard] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvc, setCvc] = useState("");
-
-  function handlePayment(e) {
-    e.preventDefault();
-    setTimeout(() => {
-      router.push("/membership/confirmation?plan=elite");
-    }, 800);
-  }
+  
 
   return (
     <main className="membership-checkout-page">
-      <form onSubmit={handlePayment}>
+      <form onSubmit={e => {
+        e.preventDefault();
+        setTimeout(() => {
+          router.push("/membership/confirmation?plan=elite");
+        }, 800);
+      }}>
           <div className="membership-title">Elite Membership Payment ($19.99) </div>
           <div className="membership-required-note">* Indicates required field</div>
 
