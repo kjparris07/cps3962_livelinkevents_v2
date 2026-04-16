@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
+
 import "../../../../styles/main.css";
 import "../../../../styles/signin.css";
 
 export default function EditOrganizer() {
   const router = useRouter();
+  const [cookies] = useCookies(["email"]);
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,57 +22,108 @@ export default function EditOrganizer() {
   const [artistGenre, setArtistGenre] = useState("");
   const [marketingEmails, setMarketingEmails] = useState(true);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("livelinkUser");
+    async function loadOrganizerData() {
+      try {
+        const res = await fetch("/api/account/organizer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: cookies.email }),
+        });
 
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
+        const result = await res.json();
 
-      setFullName(parsedUser.fullName || "");
-      setEmail(parsedUser.email || "");
-      setUsername(parsedUser.username || "");
-      setPhoneNumber(parsedUser.phoneNumber || "");
-      setOrganizationType(parsedUser.organizationType || "Artist / Organizer");
-      setWebsite(parsedUser.website || "");
-      setInstagramHandle(parsedUser.instagramHandle || "");
-      setArtistGenre(parsedUser.artistGenre || "");
-      setMarketingEmails(
-        parsedUser.marketingEmails !== undefined ? parsedUser.marketingEmails : true
-      );
-      setTwoFactorEnabled(parsedUser.twoFactorEnabled || false);
+        if (result.success) {
+          setFullName(result.user.fullName || "");
+          setEmail(result.user.email || "");
+          setUsername(result.user.username || "");
+          setPhoneNumber(result.user.phoneNumber || "");
+          setOrganizationType(result.user.organizationType || "Artist / Organizer");
+          setWebsite(result.user.website || "");
+          setInstagramHandle(result.user.instagramHandle || "");
+          setArtistGenre(result.user.artistGenre || "");
+          setMarketingEmails(
+            result.user.marketingEmails !== undefined
+              ? result.user.marketingEmails
+              : true
+          );
+          setTwoFactorEnabled(
+            result.user.twoFactorEnabled !== undefined
+              ? result.user.twoFactorEnabled
+              : false
+          );
+        } else {
+          setMessage(result.message || "Could not load organizer data.");
+        }
+      } catch (error) {
+        console.error(error);
+        setMessage("Something went wrong loading organizer data.");
+      } finally {
+        setLoading(false);
+      }
     }
-  }, []);
 
-  const handleSave = () => {
-    const existingUser = JSON.parse(localStorage.getItem("livelinkUser") || "{}");
+    if (cookies.email) {
+      loadOrganizerData();
+    } else {
+      setMessage("No logged in organizer found.");
+      setLoading(false);
+    }
+  }, [cookies.email]);
 
-    const updatedUser = {
-      ...existingUser,
-      fullName,
-      email,
-      username,
-      phoneNumber,
-      organizationType,
-      website,
-      instagramHandle,
-      artistGenre,
-      marketingEmails,
-      twoFactorEnabled,
-    };
+  async function handleSave() {
+    setSaving(true);
+    setMessage("");
 
-    localStorage.setItem("livelinkUser", JSON.stringify(updatedUser));
-    localStorage.setItem("loggedInUsername", username);
-    localStorage.setItem("loggedInEmail", email);
-    localStorage.setItem("loggedInRole", "organizer");
+    try {
+      const res = await fetch("/api/account/organizer/edit", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: cookies.email,
+          fullName,
+          username,
+          phoneNumber,
+          organizationType,
+          website,
+          instagramHandle,
+          artistGenre,
+          marketingEmails,
+          twoFactorEnabled,
+        }),
+      });
 
-    setMessage("Organizer profile updated successfully.");
+      const result = await res.json();
 
-    setTimeout(() => {
-      router.push("/account/organizer");
-    }, 1000);
-  };
+      if (result.success) {
+        setMessage("Organizer profile updated successfully.");
+
+        setTimeout(() => {
+          router.push("/account/organizer");
+        }, 1000);
+      } else {
+        setMessage(result.message || "Update failed.");
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage("Something went wrong updating organizer profile.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return <main className="signin-page">Loading...</main>;
+  }
 
   return (
     <main className="signin-page">
@@ -107,7 +161,7 @@ export default function EditOrganizer() {
             className="input-box"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            disabled
           />
         </div>
 
@@ -233,8 +287,13 @@ export default function EditOrganizer() {
             flexWrap: "wrap",
           }}
         >
-          <button type="button" className="cta-btn" onClick={handleSave}>
-            Save Changes
+          <button
+            type="button"
+            className="cta-btn"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save Changes"}
           </button>
 
           <button
