@@ -139,6 +139,57 @@ export async function createAccount(formData: FormData) {
     }
 }
 
+export async function updateAccount(email: string, formData: FormData) {
+    
+    try {
+        let setClauses:string[] = [];
+        let values = [];
+        let i = 1;
+
+        formData.forEach((value, key) => {
+            setClauses.push(`${key} = $${i}`);
+            values.push(value);
+            i++;
+        });
+        const setQuery = setClauses.join(', ');
+        values.push(email);
+
+        const finalQuery = `UPDATE customers SET ${setQuery} WHERE email = $${i} RETURNING *`;
+
+        const result = await query(finalQuery, values);
+
+        if (result.rows.length > 0) {
+            return { success: true };
+        } else if (result.rows.length === 0){
+            return { success: false, error: "Account not found. Update unsuccessful."}
+        } else {
+            return { success: false, error: "Unknown error. Update unsuccessful."}
+        }
+    } catch (error) {
+        console.error("Error updating account: ", error);
+        return { success: false, error: error };
+    }
+}
+
+export async function setCustomer(info: any) {
+    return {
+        fName: info.first_name,
+        lName: info.last_name,
+        dob: new Date(JSON.stringify(info.dob).split('.')[0].substring(1)),
+        date_reg: new Date(JSON.stringify(info.date_registered).split('.')[0].substring(1)),
+        email: info.email,
+        homeState: info.state,
+        phone: info.phone,
+        plan: info.plan == "elite" ? "Elite" : info.plan == "premium" ? "Premium" : "Basic",
+        faveGenre: info.faveGenre,
+        faveArtist: info.faveArtist,
+        alerts: info.alerts,
+        emails: info.emails,
+        private: info.private,
+        events: info.events
+    };
+}
+
 export async function deleteAccount(email:string) {
     console.log(`DELETE ACCOUNT ${email}`);
     console.log("Not implemented yet.");
@@ -162,6 +213,7 @@ export async function getAccountInfo(account_type:string, email: string) {
             }
             return { success: true, info: result.rows[0]};
         } catch (error) {
+            console.error(error);
             return { success: false, error: "Error fetching customer info."};
         }
     } else if (account_type === "organizer") {
@@ -184,6 +236,41 @@ export async function getAccountInfo(account_type:string, email: string) {
         }
     } else {
         return { success: false, error: "Invalid account type."};
+    }
+}
+
+export async function getCustomerEvents(email: string) {
+    try {
+        const customerId = (await query(
+            `SELECT id
+            FROM customers
+            WHERE email=$1`, [`${email}`]
+        )).rows[0].id;
+        const result = await query(
+            `SELECT 
+                e.event_id AS event_id,
+                e.name AS event_title,
+                e.date AS event_date,
+                e.category AS event_category,
+                a.name AS artist_name,
+                a.image AS artist_image,
+                a.genre AS artist_genre,
+                v.name AS venue_name,
+                v.city AS venue_city,
+                v.state AS venue_state,
+                o.organization AS organized_by
+            FROM events e
+            JOIN artists a ON e.artist_id = a.artist_id
+            JOIN venues v ON e.venue_id = v.venue_id
+            JOIN organizers o ON e.organizer_id = o.id
+            JOIN customer_events c ON e.event_id = c.event_id
+            WHERE now() < e.date AND c.customer_id=$1
+            ORDER BY e.date ASC;`, [`${customerId}`]
+        );
+        return { success: true, data: result.rows};
+    } catch (error) {
+        console.error('Database Error:', error);
+        return { success: false, error: error};
     }
 }
 

@@ -1,12 +1,17 @@
 "use client"
-
 import Link from "next/link";
 import { useCookies } from "react-cookie";
+import { useState, useEffect } from "react";
 
 export default function LoginBar() {
-  const [cookies, , removeCookie] = useCookies(["email"]);
+  const [cookies, , removeCookie] = useCookies();
+  const [mounted, setMounted] = useState(false);
 
-  const isLoggedIn = cookies.email
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoggedIn = mounted ? cookies.email : null;
 
   const submitLogout = () => {
     removeCookie("email");
@@ -17,7 +22,6 @@ export default function LoginBar() {
       <Link href="/" className="logo">
         LiveLink Events
       </Link>
-
       <div
         style={{
           marginLeft: "auto",
@@ -35,7 +39,6 @@ export default function LoginBar() {
             {isLoggedIn ? "Account" : "Sign Up / Sign In"}
           </span>
         </Link>
-
         {isLoggedIn && (
           <button type="button" className="auth-btn avatar-hover logout" onClick={submitLogout}>
             Logout

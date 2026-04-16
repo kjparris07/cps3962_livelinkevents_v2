@@ -2,53 +2,47 @@
 
 import Link from "next/link";
 import { useCookies } from "react-cookie";
-import "../../../styles/main.css";
-import "../../../styles/signin.css";
-import "../../../styles/account.css";
-import { getAccountInfo } from "@/app/actions";
-import { useEffect, useState } from "react"; // Added useState
+import { getAccountInfo, getCustomerEvents } from "@/app/actions";
+import { useEffect, useState } from "react";
+import { setCustomer } from "@/app/actions";
+import { CustomerDBInfo } from "@/app/globalComponents/CustomerDBInfo";
 
-type CustomerDBInfo = {
-    fName: string;
-    lName: string;
-    dob: Date;
-    date_reg: Date;
-    email: string;
-    state?: string;
-    phone?: string;
-    plan?: string;
-    genre?: string;
-    artist?: string;
-    alerts?: boolean;
-    emails?: boolean;
-    private?: boolean;
-};
+import "@/styles/main.css";
+import "@/styles/signin.css";
+import "@/styles/account.css";
 
 export default function CustomerAccountPage() {
-    const [cookies] = useCookies(["email"]);
+    const [cookies] = useCookies();
     
     const [customer, setCustomerData] = useState<CustomerDBInfo | null>(null);
+    const [events, setEvents] = useState<any[] | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
       const fetchInfo = async () => {
-        console.log("Cookie Check:", cookies.email);
-        
         if (cookies.email) {
           try {
             const db_info = await getAccountInfo("customer", cookies.email);
-            console.log("DB Response:", db_info);
 
             if (db_info.success) {
-              const info = db_info.info;
-              setCustomerData({
-                fName: info.first_name,
-                lName: info.last_name,
-                dob: new Date(JSON.stringify(info.dob)),
-                date_reg: new Date(JSON.stringify(info.date_registered)),
-                email: info.email
-              });
-            }
+              setCustomerData(await setCustomer(db_info.info));
+              const customer_events = await getCustomerEvents(cookies.email);
+              if (customer_events.success) {
+                const results = customer_events.data;
+                if (results && results.length > 0) {
+                  setEvents(results.map((event) => (
+                    <div key={event.event_id} className="event-info">
+                      <h3 className="event-date">{event.event_date.toLocaleDateString()} — {event.event_title}</h3>
+                      <h4 className="event-artist">{event.artist_name}</h4>
+                      <h5 className="event-location">{event.venue_city}, {event.venue_state}</h5>
+                    </div>
+                  )));
+                } else {
+                  setEvents(["<p className='no-results'>No events found. Try buying a ticket!</p>"]);
+                }
+              }
+              
+            } 
           } catch (err) {
             console.error("Fetch error:", err);
           }
@@ -89,6 +83,9 @@ export default function CustomerAccountPage() {
             <p>
               <strong>Phone Number:</strong> {customer.phone || "Not added"}
             </p>
+            <p>
+              <strong>Date of Birth:</strong> {customer.dob.toDateString() || "" }
+            </p>
 
             <div className="account-card-actions">
               <Link href="/account/customer/edit" className="account-primary-btn">
@@ -99,6 +96,9 @@ export default function CustomerAccountPage() {
 
           <div className="account-card">
             <h2>Membership</h2>
+            <p>
+              <strong>LiveLink Member Since:</strong>{customer.date_reg.toDateString() || ""}
+            </p>
             <p>
               <strong>Current Plan:</strong> {customer.plan || "Basic Free Plan"}
             </p>
@@ -116,36 +116,19 @@ export default function CustomerAccountPage() {
 
           <div className="account-card">
             <h2>Upcoming Tickets</h2>
-            <p>
-              <strong>Next Event:</strong> Summer Lights Festival
-            </p>
-            <p>
-              <strong>Date:</strong> August 17, 2026
-            </p>
-            <p>
-              <strong>Location:</strong> Newark, NJ
-            </p>
-            <p>
-              <strong>Status:</strong> Ticket Confirmed
-            </p>
-
-            <div className="account-card-actions">
-              <Link href="/events" className="account-primary-btn">
-                View Events
-              </Link>
-            </div>
+            {events}
           </div>
 
           <div className="account-card">
             <h2>Saved Preferences</h2>
             <p>
-              <strong>Favorite Genre:</strong> {customer.genre || "Not Added"}
+              <strong>Favorite Genre:</strong> {customer.faveGenre || "Not Added"}
             </p>
             <p>
-              <strong>Favorite Artist:</strong> {customer.artist || "Not Added"}
+              <strong>Favorite Artist:</strong> {customer.faveArtist || "Not Added"}
             </p>
             <p>
-              <strong>Preferred State:</strong> {customer.state || "Not Added"}
+              <strong>Preferred State:</strong> {customer.homeState || "Not Added"}
             </p>
 
             <div className="account-card-actions">

@@ -27,7 +27,7 @@ export default function EventsPage() {
     }
   });
 
-  return (
+ return (
     <main className="container">
       <h1 className="events-title">All Events</h1>
 

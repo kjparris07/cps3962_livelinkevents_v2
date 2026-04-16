@@ -2,15 +2,22 @@
 
 import "@/styles/membershipPages.css";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCookies } from "react-cookie";
+import { useState, useEffect } from "react";
 import { membershipPlans} from "@/lib/memberships";
 
 export default function BasicMembershipPage() {
   const router = useRouter();
+  const [ cookies ] = useCookies();
+  const [ mounted, setMounted ] = useState(false);
   
   // Simulated login check
-  const isLoggedIn = true; // Replace with real auth later
-
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  const isLoggedIn = mounted ? cookies.email : null;
+  
   if (!isLoggedIn) {
     router.push("/login?plan=basic");
     return null;
@@ -19,16 +26,15 @@ export default function BasicMembershipPage() {
   const plan = membershipPlans.basic;
   const [name, setName] = useState("");
 
-  function handleActivate(e) {
-    e.preventDefault();
-    setTimeout(() => {
-      router.push("/membership/confirmation?plan=basic");
-    }, 800);
-  }
 
   return (
     <main className="membership-checkout-page">
-      <form onSubmit={handleActivate}>
+      <form onSubmit={e => {
+        e.preventDefault();
+        setTimeout(() => {
+          router.push("/membership/confirmation?plan=basic");
+        }, 800);
+      }}>
       <div className="membership-title">Basic Free Membership ($0.00) </div>
       <div className="membership-required-note">Free Forever!</div>
     
