@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useCookies } from 'react-cookie';
 import { useRouter } from 'next/navigation';
-import { logIn } from '../actions';
 
 import "@/styles/signin.css";
 
@@ -15,64 +14,91 @@ type SignInFormData = {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [ _, setCookie ] = useCookies();
+  const [_, setCookie] = useCookies(['email']);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const { register, handleSubmit } = useForm<SignInFormData>();
-  
+
   const onSubmit = async (data: SignInFormData) => {
     setLoading(true);
-    const fd = new FormData();
+    setError("");
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        fd.append(key, value);
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const text = await res.text();
+      console.log("RAW RESPONSE:", text);
+
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        throw new Error("Server did not return JSON. Check /api/login route.");
       }
-    });
 
-    const result = await logIn(fd);
+      if (result.success) {
+        setCookie("email", data.email, { path: "/" });
 
-    if (result.success) {
-      setCookie("email", data.email);
-      if (result.account_type == 'customer') {
-        router.push("/account/customer");
+        if (result.account_type === "customer") {
+          router.push("/account/customer");
+        } else {
+          router.push("/account/organizer");
+        }
       } else {
-        router.push("/account/organizer");
+        setError(result.message || "Login failed.");
       }
-    } else {
-      console.error(result)
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong while logging in.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <main className="login-page">
       <form className="login-container" onSubmit={handleSubmit(onSubmit)}>
-
         <div className="login-title">LOG IN</div>
         <div className="required-note">* Indicates required field</div>
 
         <div className="input-group">
           <div className="input-label">Email*</div>
-          <input type="text" className="input-box" {...register("email", {required: true})}/>
+          <input
+            type="text"
+            className="input-box"
+            {...register("email", { required: true })}
+          />
         </div>
 
         <div className="input-group">
           <div className="input-label">Password*</div>
-          <input type="password" className="input-box" {...register("password", {required: true})}/>
+          <input
+            type="password"
+            className="input-box"
+            {...register("password", { required: true })}
+          />
         </div>
 
         <div className="cta">
-          <button className="cta-btn" disabled={ loading }>
-            { loading ? 'Logging In...' : 'Log In' }
+          <button type="submit" className="cta-btn" disabled={loading}>
+            {loading ? "Logging In..." : "Log In"}
           </button>
         </div>
+
+        {error && <div className="required-note">{error}</div>}
 
         <div className="footer-text">
           Or
           <br />
           <a href="/signup" className="footer-link">
             Sign Up
-          </a>
+          </a>{" "}
           to create an account
         </div>
       </form>
