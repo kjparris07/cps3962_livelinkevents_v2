@@ -1,14 +1,14 @@
 export type CustomerDBInfo = {
-    fName: string;
-    lName: string;
+    first_name: string;
+    last_name: string;
     dob: Date;
-    date_reg: Date;
+    date_registered: Date;
     email: string;
-    homeState: string;
+    state: string;
     phone: string;
     plan: string;
-    faveGenre: string;
-    faveArtist: string;
+    favegenre: string;
+    faveartist: string;
     alerts: boolean;
     emails: boolean;
     private: boolean;

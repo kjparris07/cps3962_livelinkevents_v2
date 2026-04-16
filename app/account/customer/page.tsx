@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { getAccountInfo, setCustomer, getCustomerEvents } from '@/app/actions';
 import { CustomerDBInfo } from '@/app/globalComponents/CustomerDBInfo';
+import "@/styles/account.css";
+import "@/styles/main.css";
 import Link from 'next/link';
 
 export default function CustomerPage() {
@@ -57,7 +59,7 @@ export default function CustomerPage() {
         <div className="account-header">
           <p className="account-subheading">My Account</p>
           <h1 className="account-title-main">
-            Welcome back{customer.fName ? `, ${customer.fName}` : ""}!
+            Welcome back{customer.first_name ? `, ${customer.first_name}` : ""}!
           </h1>
           <p className="account-description">
             Manage your profile, tickets, membership, and preferences all in one
@@ -69,7 +71,7 @@ export default function CustomerPage() {
           <div className="account-card">
             <h2>Profile Information</h2>
             <p>
-              <strong>Full Name:</strong> {customer.fName + ' ' + customer.lName || "Not added"}
+              <strong>Full Name:</strong> {customer.first_name + ' ' + customer.last_name || "Not added"}
             </p>
             <p>
               <strong>Email:</strong> {customer.email || "Not added"}
@@ -104,18 +106,7 @@ export default function CustomerPage() {
 
           <div className="account-card">
             <h2>Upcoming Tickets</h2>
-            <p>
-              <strong>Next Event:</strong> Summer Lights Festival
-            </p>
-            <p>
-              <strong>Date:</strong> August 17, 2026
-            </p>
-            <p>
-              <strong>Location:</strong> Newark, NJ
-            </p>
-            <p>
-              <strong>Status:</strong> Ticket Confirmed
-            </p>
+            {events}
 
             <div className="account-card-actions">
               <Link href="/events" className="account-primary-btn">
@@ -127,13 +118,13 @@ export default function CustomerPage() {
           <div className="account-card">
             <h2>Saved Preferences</h2>
             <p>
-              <strong>Favorite Genre:</strong> {customer.faveGenre || "Not Added"}
+              <strong>Favorite Genre:</strong> {customer.favegenre || "Not Added"}
             </p>
             <p>
-              <strong>Favorite Artist:</strong> {customer.faveArtist || "Not Added"}
+              <strong>Favorite Artist:</strong> {customer.faveartist || "Not Added"}
             </p>
             <p>
-              <strong>Preferred State:</strong> {customer.homeState || "Not Added"}
+              <strong>Preferred State:</strong> {customer.state || "Not Added"}
             </p>
 
             <div className="account-card-actions">

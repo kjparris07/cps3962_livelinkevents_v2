@@ -11,7 +11,6 @@ import "@/styles/signin.css";
 type SignInFormData = {
   email: string;
   password: string;
-  account_type: "customer" | "organizer";
 };
 
 export default function LoginPage() {
@@ -19,6 +18,7 @@ export default function LoginPage() {
   const [ _, setCookie ] = useCookies();
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm<SignInFormData>();
+  const [error, setError] = useState("");
   
   const onSubmit = async (data: SignInFormData) => {
     setLoading(true);
@@ -30,13 +30,15 @@ export default function LoginPage() {
       }
     });
 
-  const result = await logIn(fd);
-  if (result.success) {
-    setCookie("email", data.email, { path: "/"});
-    setCookie("accountType", data.account_type, { path: "/"});
-    router.push(`/account/${data.account_type}`);
-  }
-  setLoading(false);
+    const result = await logIn(fd);
+    if (result.success) {
+      setCookie("email", data.email, { path: "/"});
+      setCookie("accountType", result.account_type, { path: "/"});
+      router.push(`/account/${result.account_type}`);
+    } else {
+      setError(`${result.error}`);
+    }
+    setLoading(false);
   };
 
   return (
@@ -46,14 +48,9 @@ export default function LoginPage() {
         <div className="login-title">LOG IN</div>
         <div className="required-note">* Indicates required field</div>
 
-        <div className="input-group">
-          <label className="input-label">Account Type:</label>
-          <select className="input-box" {...register("account_type", {required: true})}>
-            <option value="customer">Customer</option>
-            <option value="organizer">Organizer</option>
-          </select>
-
-        </div>
+        {error && (
+            <p id="input-error" style={{ color: "red", marginBottom: "15px" }}>{error}</p>
+        )}
 
         <div className="input-group">
           <div className="input-label">Email*</div>

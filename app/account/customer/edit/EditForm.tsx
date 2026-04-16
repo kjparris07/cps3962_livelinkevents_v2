@@ -53,12 +53,12 @@ export default function EditForm({customer}:{[key:string]:any}) {
 
         <div className="input-group">
           <label className="input-label" htmlFor="fName">First Name</label>
-          <input {...register("fName")} id="fName" className="input-box" />
+          <input {...register("first_name")} id="fName" className="input-box" />
         </div>
 
         <div className="input-group">
           <label className="input-label" htmlFor="lName">Last Name</label>
-          <input {...register("lName")} id="lName" className="input-box" />
+          <input {...register("last_name")} id="lName" className="input-box" />
         </div>
 
         <div className="input-group">
@@ -68,17 +68,17 @@ export default function EditForm({customer}:{[key:string]:any}) {
 
         <div className="input-group">
           <label className="input-label" htmlFor="faveGenre">Favorite Genre</label>
-          <input {...register("faveGenre")} id="faveGenre" className="input-box" />
+          <input {...register("favegenre")} id="faveGenre" className="input-box" />
         </div>
 
         <div className="input-group">
           <label className="input-label" htmlFor="faveArtist">Favorite Artist</label>
-          <input {...register("faveArtist")} id="faveArtist" className="input-box" />
+          <input {...register("faveartist")} id="faveArtist" className="input-box" />
         </div>
 
         <div className="input-group">
           <label className="input-label" htmlFor="homeState">Home State</label>
-          <input {...register("homeState")} id="homeState" maxLength={2} className="input-box" />
+          <input {...register("state")} id="homeState" maxLength={2} className="input-box" />
         </div>
 
         <div className="input-group">

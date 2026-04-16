@@ -14,66 +14,45 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 export async function logIn(formData: FormData) {
-    const email =  formData.get('email') as string;
+    const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
     try {
         const accounts = await query(
-            `SELECT password
-            FROM users
-            WHERE email=$1;`, [`${email}`]
+            `SELECT password FROM users WHERE email=$1;`, 
+            [email]
         );
 
-        if (accounts.rows.length == 0) {
+        if (accounts.rows.length === 0) {
             return { success: false, error: "No account found." };
         }
 
-        if (accounts.rows.length > 1) {
-            return { success: false, error: "Multiple accounts found." };
-        }
-        
         const isValid = await verifyPassword(password, accounts.rows[0].password);
-        if (isValid) {
-            try {
-                const customers = await query(
-                    `SELECT email
-                    FROM customers
-                    WHERE email=$1`, [`${email}`]
-                );
-
-                if (customers.rows.length == 0) {
-                    try {
-                        const organizers = await query(
-                            `SELECT email
-                            FROM organizers
-                            WHERE email=$1`, [`${email}`]
-                        );
-                        if (organizers.rows.length == 0) {
-                            return { success: false, error: "Account found without type."};
-                        }
-
-                        if (organizers.rows.length > 1) {
-                            return { success: false, error: "Multiple organizer accounts found."};
-                        }
-                        return { success: true, account_type: "organizer"};
-                    } catch (error) {
-                        return { success: false, error: "Account found, error checking account type."};
-                    }
-                }
-
-                if (customers.rows.length > 1) {
-                    return { success: false, error: "Multiple customer accounts found."};
-                }
-                return { success: true, account_type: "customer"};
-            } catch (error) {
-                return { success: false, error: "Account found, error checking account type."}
-            }
-        } else {
+        if (!isValid) {
             return { success: false, error: "Invalid credentials." };
         }
+
+        const customerCheck = await query(
+            `SELECT email FROM customers WHERE email=$1 LIMIT 1;`, 
+            [email]
+        );
+        if (customerCheck.rows.length > 0) {
+            return { success: true, account_type: "customer" };
+        }
+
+        const organizerCheck = await query(
+            `SELECT email FROM organizers WHERE email=$1 LIMIT 1;`, 
+            [email]
+        );
+        if (organizerCheck.rows.length > 0) {
+            return { success: true, account_type: "organizer" };
+        }
+
+        return { success: false, error: "Account found, but role not assigned." };
+
     } catch (error) {
-        console.error(error);
-        return { success: false, error: "Error checking database." };
+        console.error("Database Error:", error);
+        return { success: false, error: "Internal server error." };
     }
 }
 
@@ -181,16 +160,16 @@ export async function updateAccount(account_type: "customer" | "organizer", emai
 
 export async function setCustomer(info: any) {
     return {
-        fName: info.first_name,
-        lName: info.last_name,
+        first_name: info.first_name,
+        last_name: info.last_name,
         dob: new Date(JSON.stringify(info.dob).split('.')[0].substring(1)),
-        date_reg: new Date(JSON.stringify(info.date_registered).split('.')[0].substring(1)),
+        date_registered: new Date(JSON.stringify(info.date_registered).split('.')[0].substring(1)),
         email: info.email,
-        homeState: info.state,
+        state: info.state,
         phone: info.phone,
         plan: info.plan == "elite" ? "Elite" : info.plan == "premium" ? "Premium" : "Basic",
-        faveGenre: info.faveGenre,
-        faveArtist: info.faveArtist,
+        favegenre: info.favegenre,
+        faveartist: info.faveartist,
         alerts: info.alerts,
         emails: info.emails,
         private: info.private,
@@ -207,8 +186,8 @@ export async function setOrganizer(info: any) {
         role: info.role,
         website: info.website,
         instagram: info.instagram,
-        company: info.organization,
-        payoutMethod: info.payout_method,
+        organization: info.organization,
+        payout_method: info.payout_method,
         events: info.events
     };
 }

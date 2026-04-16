@@ -81,6 +81,7 @@ export default function SignupPage() {
       }
     } else {
       console.error("Something went wrong...", result.error);
+      setError(`Something went wrong...${result.error}`);
     }
     setLoading(false);
 

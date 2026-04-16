@@ -55,7 +55,7 @@ export default function EditForm({organizer}:{[key:string]:any}) {
 
         <div className="input-group">
           <label className="input-label" htmlFor="company">Phone Number</label>
-          <input {...register("company")} id="company" className="input-box" type="text" />
+          <input {...register("organization")} id="company" className="input-box" type="text" />
         </div>
 
         <div className="input-group">

@@ -2,11 +2,11 @@ export type OrganizerDBInfo = {
     name: string;
     email: string;
     phone: string;
-    company: string;
+    organization: string;
     role: string;
     website: string;
     instagram: string;
     genre: string;
-    payoutMethod: string;
+    payout_method: string;
     events: any[];
 };

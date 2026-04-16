@@ -80,7 +80,7 @@ export default function OrganizerAccountPage() {
               <strong>Name:</strong> {organizer.name || "Not added"}
             </p>
             <p>
-              <strong>Email:</strong> {organizer?.email || "Not added"}
+              <strong>Email:</strong> {organizer.email || "Not added"}
             </p>
             <p>
               <strong>Business Phone:</strong> {organizer.phone || "Not added"}
@@ -99,7 +99,7 @@ export default function OrganizerAccountPage() {
           <div className="account-card">
             <h2>Organizer Status</h2>
             <p>
-              <strong>Payout Method:</strong> {organizer.payoutMethod}
+              <strong>Payout Method:</strong> {organizer.payout_method}
             </p>
             <p>
               <strong>Monthly Sales:</strong> ${2412.89}
