@@ -1,70 +1,103 @@
-import { useForm } from "react-hook-form";
+"use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateAccount } from "@/app/actions";
 
-export default function EditForm({organizer}:{[key:string]:any}) {
+export default function EditForm({ organizer }: { organizer: any }) {
   const router = useRouter();
-  const { register, handleSubmit, formState: { dirtyFields } } = useForm({
-    defaultValues: { ...organizer }
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    fullName: organizer.fullName || "",
+    companyName: organizer.companyName || "",
+    organizationType: organizer.organizationType || "",
+    phoneNumber: organizer.phoneNumber || "",
+    artistGenre: organizer.artistGenre || "",
+    website: organizer.website || "",
+    instagramHandle: organizer.instagramHandle || "",
   });
-  const [ loading, setLoading] = useState(false);
 
-  const handleSave = async (data: any) => {
-    if (organizer && organizer.email) {
-      setLoading(true);
-      const fd = new FormData();
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-      Object.entries(data).forEach(([key, value]) => {
-        if (!(key in dirtyFields)) return;
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-        if (value !== undefined && value !== null && value !== "") {
-          fd.append(key, value.toString());
-        }
+    try {
+      const res = await fetch("/api/account/organizer/edit", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: organizer.email,
+          ...formData,
+        }),
       });
 
-      if (!Object.keys(dirtyFields).length) {
-        router.push("/account/organizer");
-        return;
-      }
+      const result = await res.json();
 
-      const outcome = await updateAccount("organizer", organizer.email, fd);
-      setLoading(false);
-
-      if (outcome.success) {
+      if (result.success) {
         router.push("/account/organizer");
       } else {
-        console.error("Error occurred.", outcome.error);
+        console.error(result.message);
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <main className="signin-page">
-
-      <form onSubmit={handleSubmit((d) => handleSave(d))} className="signin-container">
+      <form onSubmit={handleSave} className="signin-container">
         <h1 className="signin-title">EDIT ACCOUNT</h1>
         <p className="required-note">
           Update your profile, contact details, preferences, and privacy settings
         </p>
 
         <div className="input-group">
-          <label className="input-label" htmlFor="name">Full Name</label>
-          <input {...register("name")} id="name" className="input-box" />
+          <label className="input-label" htmlFor="fullName">Full Name</label>
+          <input
+            id="fullName"
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            className="input-box"
+            type="text"
+          />
         </div>
 
         <div className="input-group">
-          <label className="input-label" htmlFor="company">Phone Number</label>
-          <input {...register("organization")} id="company" className="input-box" type="text" />
+          <label className="input-label" htmlFor="companyName">Company Name</label>
+          <input
+            id="companyName"
+            name="companyName"
+            value={formData.companyName}
+            onChange={handleChange}
+            className="input-box"
+            type="text"
+          />
         </div>
 
         <div className="input-group">
-          <label className="input-label" htmlFor="role">
+          <label className="input-label" htmlFor="organizationType">
             Organizer Type
           </label>
           <select
-            {...register("role")}
-            id="role"
+            id="organizationType"
+            name="organizationType"
+            value={formData.organizationType}
+            onChange={handleChange}
             className="input-box"
           >
             <option value="Artist / Organizer">Artist / Organizer</option>
@@ -76,26 +109,56 @@ export default function EditForm({organizer}:{[key:string]:any}) {
         </div>
 
         <div className="input-group">
-          <label className="input-label" htmlFor="phone">Phone Number</label>
-          <input {...register("phone")} id="phone" className="input-box" type="number" min={1000000000} />
+          <label className="input-label" htmlFor="phoneNumber">Phone Number</label>
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            className="input-box"
+            type="text"
+          />
         </div>
 
         <div className="input-group">
-          <label className="input-label" htmlFor="genre">genre</label>
-          <input {...register("genre")} id="genre" className="input-box" />
+          <label className="input-label" htmlFor="artistGenre">Genre</label>
+          <input
+            id="artistGenre"
+            name="artistGenre"
+            value={formData.artistGenre}
+            onChange={handleChange}
+            className="input-box"
+            type="text"
+          />
         </div>
 
         <div className="input-group">
           <label className="input-label" htmlFor="website">Website</label>
-          <input {...register("website")} id="website" className="input-box" />
+          <input
+            id="website"
+            name="website"
+            value={formData.website}
+            onChange={handleChange}
+            className="input-box"
+            type="text"
+          />
         </div>
 
         <div className="input-group">
-          <label className="input-label" htmlFor="instagram">Instagram</label>
-          <input {...register("instagram")} id="instagram" className="input-box" />
+          <label className="input-label" htmlFor="instagramHandle">Instagram</label>
+          <input
+            id="instagramHandle"
+            name="instagramHandle"
+            value={formData.instagramHandle}
+            onChange={handleChange}
+            className="input-box"
+            type="text"
+          />
         </div>
-        
-        <button className="account-primary-btn">{loading ? "Loading..." : "Save Changes"}</button>
+
+        <button type="submit" className="account-primary-btn" disabled={loading}>
+          {loading ? "Saving..." : "Save Changes"}
+        </button>
       </form>
     </main>
   );

@@ -4,155 +4,141 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
-import { createAccount } from "@/app/actions";
 import "@/styles/signin.css";
-import "@/styles/main.css";
 
-type SignUpFormData = {
-  // shared fields
+type FormData = {
+  accountType: "customer" | "organizer";
   email: string;
-  account_type: 'customer' | 'organizer';
   password: string;
   confirmPassword: string;
-  // Customer ONLY fields
-  fName?: string;
-  lName?: string;
+
+  // organizer
+  fullName?: string;
+  phoneNumber?: string;
+  companyName?: string;
+
+  // customer
+  firstName?: string;
+  lastName?: string;
   dob?: string;
-  // Organizer ONLY fields
-  name?: string;
-  phone?: string;
-  company?: string;
 };
 
 export default function SignupPage() {
   const router = useRouter();
-  const [ _, setCookie ] = useCookies();
+  const [_, setCookie] = useCookies();
   const [loading, setLoading] = useState(false);
-  const { register, watch, handleSubmit } = useForm<SignUpFormData>({
+  const [error, setError] = useState("");
+
+  const { register, handleSubmit, watch } = useForm<FormData>({
     defaultValues: {
-      account_type: 'customer'
-    }
+      accountType: "customer",
+    },
   });
-  const [error, setError ] = useState("");
 
-  const accountType = watch('account_type');
+  const accountType = watch("accountType");
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex = /^(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
-
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
     setError("");
-
-    if (!emailRegex.test(data.email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-
-    if (!passwordRegex.test(data.password)) {
-      setError(
-        "Password must be at least 6 characters and include at least one number and one symbol."
-      );
-      return;
-    }
 
     if (data.password !== data.confirmPassword) {
       setError("Passwords do not match.");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    const fd = new FormData();
+    try {
+      const endpoint =
+        data.accountType === "organizer"
+          ? "/api/account/organizer"
+          : "/api/account/customer";
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "" && key !== "confirmPassword") {
-        fd.append(key, value.toString());
-      }
-    });
+      const body =
+        data.accountType === "organizer"
+          ? {
+              email: data.email,
+              password: data.password,
+              fullName: data.fullName,
+              phoneNumber: data.phoneNumber,
+              companyName: data.companyName,
+            }
+          : {
+              email: data.email,
+              password: data.password,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              dob: data.dob,
+            };
 
-    const result = await createAccount(fd);
-    if (result.success) {
-      setCookie("email", fd.get('email'));
-      if (accountType === "customer") {
-        setCookie("accountType", "customer");
-        router.push("/account/customer");
-      } else {
-        setCookie("accountType", "organizer");
-        router.push("/account/organizer");
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        setError(result.message || "Signup failed.");
+        setLoading(false);
+        return;
       }
-    } else {
-      console.error("Something went wrong...", result.error);
-      setError(`Something went wrong...${result.error}`);
+
+      // set cookies
+      setCookie("email", data.email, { path: "/" });
+      setCookie("accountType", data.accountType, { path: "/" });
+
+      // redirect
+      router.push(`/account/${data.accountType}`);
+    } catch (err) {
+      console.error(err);
+      setError("Server error.");
     }
-    setLoading(false);
 
+    setLoading(false);
   };
 
   return (
-    <main className="signup-page">
-      <div className="signup-container container">
+    <main className="login-page">
+      <form className="login-container" onSubmit={handleSubmit(onSubmit)}>
+        <div className="login-title">SIGN UP</div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="sign-up-form">
-          <div className='login-title'>SIGN UP</div>
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-          {/* Shared Fields */}
-          <div className="input-group">
-            <label className="input-label">Account Type:</label>
-            <select className="input-box" {...register("account_type")}>
-              <option value="customer">Customer</option>
-              <option value="organizer">Organizer</option>
-            </select>
-            <label className="input-label">Email:</label>
-            <input className="input-box" {...register("email", { required: true })} placeholder="Email" type="email" />
-            
-            <label className="input-label">Password:</label>
-            <input className="input-box" {...register("password", { required: true })} placeholder="Password" type="password" />
-            <input className="input-box" {...register("confirmPassword", { required: true })} placeholder="Confirm Password" type="password" />
-          </div>
+        {/* account type */}
+        <select {...register("accountType")}>
+          <option value="customer">Customer</option>
+          <option value="organizer">Organizer</option>
+        </select>
 
-          {/* Conditional Fields for CUSTOMER */}
-          {accountType === 'customer' && (
-            <div className="dynamic-fields input-group">
-              <label className="input-label">First Name:</label>
-              <input className="input-box" {...register("fName", { required: true })} placeholder="First Name" />
+        <input placeholder="Email" {...register("email")} required />
+        <input type="password" placeholder="Password" {...register("password")} required />
+        <input type="password" placeholder="Confirm Password" {...register("confirmPassword")} required />
 
-              <label className="input-label">Last Name:</label>
-              <input className="input-box" {...register("lName", { required: true })} placeholder="Last Name" />
-              
-              <label className="input-label">Date of Birth:</label>
-              <input className="input-box" {...register("dob", { required: true })} type="date" />
-            </div>
-          )}
+        {/* organizer fields */}
+        {accountType === "organizer" && (
+          <>
+            <input placeholder="Full Name" {...register("fullName")} required />
+            <input placeholder="Phone Number" {...register("phoneNumber")} required />
+            <input placeholder="Company Name" {...register("companyName")} required />
+          </>
+        )}
 
-          {/* Conditional Fields for ORGANIZER */}
-          {accountType === 'organizer' && (
-            <div className="dynamic-fields input-group">
-              <label className="input-label">Full Name:</label>
-              <input className="input-box" {...register("name", { required: true })} placeholder="Full Name" />
+        {/* customer fields */}
+        {accountType === "customer" && (
+          <>
+            <input placeholder="First Name" {...register("firstName")} required />
+            <input placeholder="Last Name" {...register("lastName")} required />
+            <input type="date" {...register("dob")} required />
+          </>
+        )}
 
-              <label className="input-label">Phone Number (10 digits):</label>
-              <input className="input-box" {...register("phone", { required: true })} placeholder="Phone (1234567890)" min={1000000000} maxLength={10} />
-              
-              <label className="input-label">Company Name:</label>
-              <input className="input-box" {...register("company", { required: true })} placeholder="Organization/Company Name" />
-            </div>
-          )}
-
-          {error && (
-            <p id="input-error" style={{ color: "red", marginBottom: "15px" }}>{error}</p>
-          )}
-
-          <button type="submit" className="cta-btn">
-            { loading ? "Loading..." : "Sign Up as " + accountType.toUpperCase() }
-          </button>
-        </form>
-
-        <div className="footer-text">
-          Already have an account? 
-          <a href="/login" className="footer-link">
-            {" "} Log In
-          </a>
-        </div>
-      </div>
+        <button type="submit" disabled={loading}>
+          {loading ? "Loading..." : "Create Account"}
+        </button>
+      </form>
     </main>
   );
 }

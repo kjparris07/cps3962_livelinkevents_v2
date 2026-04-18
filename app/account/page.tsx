@@ -1,27 +1,37 @@
-'use client'
+"use client";
 
-import { useCookies } from 'react-cookie';
-import '@/styles/main.css';
+import { useEffect } from "react";
+import { useCookies } from "react-cookie";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import "@/styles/main.css";
 import "@/styles/account.css";
 
-export default function Home() {
-  const [ cookies ] = useCookies();
+export default function AccountPage() {
+  const [cookies] = useCookies(["email", "accountType"]);
+  const router = useRouter();
 
-  if (cookies.email) {
-    const email = cookies.email;
-    const atSign = email.indexOf('@');
-    const name = email.substring(0, atSign);
+  useEffect(() => {
+    if (cookies.email && cookies.accountType) {
+      router.push(`/account/${cookies.accountType}`);
+    }
+  }, [cookies.email, cookies.accountType, router]);
+
+  if (!cookies.email) {
     return (
       <main>
-        <div className="container">
-          <h1 className="title">ACCOUNT</h1>
-          <p>Hello, {name}!</p>
-        </div>
+        <h3>
+          Please <Link href="/login">login</Link> to access your account.
+        </h3>
       </main>
     );
-  } else {
-    return (
-      <h3>Please <a href="/login">login</a> to access your account.</h3>
-    );
   }
+
+  return (
+    <main>
+      <div className="container">
+        <h1 className="title">Redirecting...</h1>
+      </div>
+    </main>
+  );
 }
