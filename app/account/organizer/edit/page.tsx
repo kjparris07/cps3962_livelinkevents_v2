@@ -2,67 +2,28 @@
 
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { getAccountInfo, setOrganizer } from "@/app/actions";
+import { OrganizerDBInfo } from "@/app/globalComponents/OrganizerDBInfo";
 import EditForm from "./EditForm";
 import "@/styles/main.css";
 import "@/styles/signin.css";
 
-type OrganizerData = {
-  fullName: string;
-  email: string;
-  username: string;
-  phoneNumber: string;
-  organizationType: string;
-  website: string;
-  instagramHandle: string;
-  artistGenre: string;
-  verifiedOrganizer: boolean;
-  eventsPublished: number;
-  monthlySales: string;
-  payoutMethod: string;
-  marketingEmails: boolean;
-  twoFactorEnabled: boolean;
-};
-
-export default function EditOrganizerPage() {
-  const [cookies] = useCookies(["email"]);
-  const [organizer, setOrganizer] = useState<OrganizerData | null>(null);
-  const [message, setMessage] = useState("");
-
+export default function EditOrganizer() {
+  const [ cookies ] = useCookies();
+  const [ organizer, setOrganizerData ] = useState<OrganizerDBInfo | null>(null);
+  
   useEffect(() => {
-    if (!cookies.email) {
-      setMessage("Please login first.");
-      return;
-    }
-
-    const fetchOrganizer = async () => {
-      try {
-        const response = await fetch("/api/account/organizer", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: cookies.email }),
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-          setMessage(data.message || "Could not load organizer info.");
-          return;
+    const fetchInfo = async () => {
+      if (cookies.email) {
+        const db_info = await getAccountInfo("organizer", cookies.email);
+        if (db_info.success) {
+          setOrganizerData(await setOrganizer(db_info.info));
         }
-
-        setOrganizer(data.user);
-      } catch (error) {
-        console.error(error);
-        setMessage("Server error loading organizer info.");
       }
     };
-
-    fetchOrganizer();
+    fetchInfo();
   }, [cookies.email]);
 
-  if (message) return <div>{message}</div>;
   if (!organizer) return <div>Loading...</div>;
-
   return <EditForm organizer={organizer} />;
 }

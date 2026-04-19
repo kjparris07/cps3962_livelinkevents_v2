@@ -1,78 +1,32 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useCookies } from 'react-cookie';
-import { useRouter } from 'next/navigation';
-import { deleteAccount } from '@/app/actions';
+import { useState, useEffect } from "react";
+import { useCookies } from "react-cookie";
+import { getAccountInfo } from "@/app/actions";
+import { setCustomer } from "@/app/actions";
+import { CustomerDBInfo } from "@/app/globalComponents/CustomerDBInfo";
+import EditForm from "@/app/account/customer/edit/EditForm";
 
 import "@/styles/main.css";
 import "@/styles/account.css";
+import "@/styles/signin.css";
 
-export default function DeleteCustomerPage() {
-  const [cookies, , removeCookie] = useCookies();
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const router = useRouter();
+export default function EditCustomer() {
+  const [ cookies ] = useCookies(["email"]);
+  const [ customer, setCustomerData ] = useState<CustomerDBInfo | null>(null);
 
-  async function handleDelete() {
-    setLoading(true);
-    setMessage('');
-
-    if (cookies.email) {
-      try {
-        const result = await deleteAccount(cookies.email, "customer"); // ✅ FIXED
-
-        if (result.success) {
-          removeCookie("email", { path: "/" });
-          removeCookie("accountType", { path: "/" });
-          router.push("/");
-        } else {
-          throw Error();
+  useEffect(() => {
+    const fetchInfo = async () => {
+      if (cookies.email) {
+        const db_info = await getAccountInfo("customer", cookies.email);
+        if (db_info.success) {
+          setCustomerData(await setCustomer(db_info.info));
         }
-      } catch {
-        setMessage('Something went wrong deleting customer account.');
-      } finally {
-        setLoading(false);
       }
-    }
-  }
+    };
+    fetchInfo();
+  }, [cookies.email]);
 
-  const handleReset = () => {
-    router.push("/account/customer/edit"); // if you have one
-  };
-
-  return (
-    <main className='account-page'>
-      <div className='account-box delete-container'>
-        <h1>Delete Customer Account</h1>
-        <p>Are you sure you want to delete your account?</p>
-
-        <div className="account-actions">
-          <button
-            className="account-secondary-btn"
-            onClick={() => router.push("/account/customer")}
-          >
-            No, Go Back
-          </button>
-
-          <button
-            className="account-warning-btn"
-            onClick={handleReset}
-          >
-            Reset Settings
-          </button>
-
-          <button
-            className="account-danger-btn"
-            onClick={handleDelete}
-            disabled={loading}
-          >
-            {loading ? 'Deleting...' : 'Delete Account'}
-          </button>
-        </div>
-
-        {message && <p>{message}</p>}
-      </div>
-    </main>
-  );
+  if (!customer) return <div>Loading...</div>;
+  return <EditForm customer={customer} />;
 }

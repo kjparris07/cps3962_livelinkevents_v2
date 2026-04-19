@@ -21,58 +21,31 @@ export default function DeleteOrganizerPage() {
     if (cookies.email) {
       try {
         const result = await deleteAccount(cookies.email, "organizer");
-
         if (result.success) {
-          removeCookie("email", { path: "/" });
-          removeCookie("accountType", { path: "/" });
+          removeCookie("email", {path: "/"});
+          removeCookie("accountType", {path: "/"});
           router.push("/");
         } else {
-          throw Error();
+          throw Error("Could not delete from database.");
         }
-      } catch {
+      } catch (error) {
+        console.error(error);
         setMessage('Something went wrong deleting organizer account.');
       } finally {
         setLoading(false);
       }
     }
+    
   }
 
-  const handleReset = () => {
-    router.push("/account/organizer/edit");
-  };
-
   return (
-    <main className='account-page'>
-      <div className='account-box delete-container'>
-        <h1>Delete Organizer Account</h1>
-        <p>Are you sure you want to delete your organizer account?</p>
-
-        <div className="account-actions">
-          <button
-            className="account-secondary-btn"
-            onClick={() => router.push("/account/organizer")}
-          >
-            No, Go Back
-          </button>
-
-          <button
-            className="account-warning-btn"
-            onClick={handleReset}
-          >
-            Reset Settings
-          </button>
-
-          <button
-            className="account-danger-btn"
-            onClick={handleDelete}
-            disabled={loading}
-          >
-            {loading ? 'Deleting...' : 'Delete Account'}
-          </button>
-        </div>
-
-        {message && <p>{message}</p>}
-      </div>
+    <main className='container delete-container'>
+      <h1>Delete Organizer Account</h1>
+      <p>Are you sure you want to delete your organizer account?</p>
+      <button className='account-primary-btn' onClick={handleDelete} disabled={loading}>
+        {loading ? 'Deleting...' : 'Delete Account'}
+      </button>
+      {message && <p>{message}</p>}
     </main>
   );
 }
