@@ -1,24 +1,27 @@
-import { NextResponse } from "next/server";
-import { logIn } from "@/app/actions"; // adjust path if needed
+// app/api/events/create/route.ts
+
+let events: any[] = []; // temporary in-memory storage
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const fd = new FormData();
-    fd.append("email", body.email);
-    fd.append("password", body.password);
+    const newEvent = {
+      id: Date.now().toString(),
+      name: body.name,
+      date: body.date,
+      location: body.location,
+      description: body.description,
+    };
 
-    const result = await logIn(fd);
+    events.push(newEvent);
 
-    return NextResponse.json(result);
-
+    return new Response(JSON.stringify(newEvent), {
+      status: 201,
+    });
   } catch (error) {
-    console.error(error);
-
-    return NextResponse.json(
-      { success: false, message: "Server error" },
-      { status: 500 }
-    );
+    return new Response("Failed to create event", {
+      status: 500,
+    });
   }
 }

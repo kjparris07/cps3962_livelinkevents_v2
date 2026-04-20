@@ -45,7 +45,7 @@ export default function EventTicketPage({ params }: PageProps) {
   if (!event) {
     return (
       <main className="container">
-        <h1>Loading event...</h1>
+        <h1 search-title>Loading event...</h1>
         <Link href="/events" className="view-events-btn">
           Back to all events
         </Link>
