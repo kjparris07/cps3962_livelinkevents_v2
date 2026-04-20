@@ -1,5 +1,6 @@
 'use server'
 import { query } from '@/lib/db';
+import { Ticket } from './globalComponents/Ticket';
 import bcrypt from 'bcryptjs';
 
 export async function hashPassword(password: string): Promise<string> {
@@ -299,6 +300,200 @@ export async function getAccountInfo(account_type:string, email: string) {
     }
 }
 
+export async function getOrganizerId(email : string) {
+    try {
+        const id = (await query(
+            `SELECT id
+            FROM organizers
+            WHERE email=$1`, [`${email}`]
+        )).rows[0].id;
+        return { success: true, id: id };
+    } catch (error) {
+        return {success: false, error: error};
+    }
+}
+
+export async function getArtists() {
+    try {
+        const artists = (await query(
+            `SELECT *
+            FROM artists`
+        )).rows;
+        return { success: true, artists: artists };
+    } catch (error) {
+        return {success: false, error: error};
+    }
+}
+
+export async function getVenues(orgId:number) {
+    try {
+        const venues = (await query(
+            `SELECT *
+            FROM venues
+            WHERE organizer_id=$1`, [`${orgId}`]
+        )).rows;
+        return { success: true, venues: venues };
+    } catch (error) {
+        console.error("Something went wrong", error)
+        return {success: false, error: error};
+    }
+}
+
+export async function createArtist(fd : FormData) {
+    try {
+        const name = fd.get("name");
+        const genre = fd.get("genre");
+        const image = fd.get("image");
+        const bio = fd.get("bio");
+        const artist = await query(
+            `INSERT
+            INTO artists
+            VALUES (default, $1, $2, $3, $4)
+            RETURNING *`, [ `${name}`, `${image}`, `${genre}`, `${bio}`]
+        );
+        return {success: true, artist: 
+            {
+                artist_id: artist.rows[0].artist_id,
+                name: artist.rows[0].name,
+                image: artist.rows[0].image,
+                genre: artist.rows[0].genre,
+                bio: artist.rows[0].bio,
+            }
+        };  
+    } catch (error) {
+        return { success: false, error: error };
+    }
+    
+}
+
+export async function createVenue(orgId:number, fd: FormData) {
+    try {
+        const name = fd.get("name");
+        const street = fd.get("street");
+        const city = fd.get("city");
+        const state = fd.get("state");
+        const zipcode = fd.get("zipcode");
+        const capacity = fd.get("capacity");
+        const map = fd.get("map");
+        const venue = await query(
+            `INSERT
+            INTO venues
+            VALUES (default, $1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *`,
+            [ 
+                `${name}`, `${street}`, `${city}`, `${state}`, 
+                `${zipcode}`, `${orgId}`, `${capacity}`, `${map}` 
+            ]
+        );
+        return { success: true, venue: 
+            {
+                venue_id: venue.rows[0].venue_id,
+                name: venue.rows[0].name,
+                street: venue.rows[0].street,
+                city: venue.rows[0].city,
+                state: venue.rows[0].state,
+                zipcode: venue.rows[0].zipcode,
+                organizer_id: venue.rows[0].organizer_id,
+                capacity: venue.rows[0].capacity,
+                map: venue.rows[0].map
+            }
+        };
+    } catch (error) {
+        return { success: false, error: error };
+    }
+}
+   
+export async function createEvent(orgId:number, fd : FormData) {
+    try {
+        const name = fd.get("name");
+        const date = fd.get("date");
+        const artist_id = fd.get("artist_id");
+        const venue_id = fd.get("venue_id");
+        const category = fd.get("category");
+        const prices = JSON.parse(fd.get("prices") as string);
+        
+        const ticketArr = prices.map((t:Ticket) => {
+            const tier = t.tier;
+            const price = t.price.toFixed(2);
+            const quantity = t.quantity;
+            return `"(\\"(${tier},${price})\\", ${quantity})"`;
+        });
+
+        const event = await query(
+            `INSERT
+            INTO events
+            VALUES (default, $1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`,
+            [ 
+                `${name}`, `${date}`, `${artist_id}`, `${venue_id}`,
+                `${orgId}`, `${category}`, `{${ticketArr.join(", ")}}`
+            ]
+        );
+
+        const event_id = event.rows[0].event_id
+
+        await query(
+            `INSERT
+            INTO organizer_events
+            VALUES ($1, $2)`, [`${orgId}`, `${event_id}`]
+        );
+        return { success: true, event_id: event_id };
+
+    } catch (error) {
+        return { success: false, error: error};
+    }
+}
+
+export async function updateEvent(eventId:string, fd: FormData){
+    let setClauses:string[] = [];
+    let values:any = [];
+    let i = 1;
+
+    fd.forEach((value, key) => {
+        setClauses.push(`${key} = $${i}`);
+        if (key !== "prices"){
+            values.push(value);
+        } else {
+            const prices = JSON.parse(fd.get("prices") as string);
+            const ticketArr = prices.map((t:Ticket) => {
+                const tier = t.tier;
+                const price = t.price.toFixed(2);
+                const quantity = t.quantity;
+                return `"(\\"(${tier},${price})\\", ${quantity})"`;
+            });
+            values.push(`{${ticketArr.join(", ")}}`);
+        }
+        i++;
+    });
+    values.push(eventId);
+
+    const setQuery = setClauses.join(', ');
+
+    let finalQuery = `UPDATE events SET ${setQuery} WHERE event_id = $${i} RETURNING *`;
+
+    let result = null;
+    
+    try {
+        result = await query(finalQuery, values);
+        return { success: true, event: result.rows[0] };
+    } catch (error) {
+        return { success: false, error: `${error}` };
+    }
+}
+
+export async function deleteEvent(eventId:string){
+    try {
+        await query(
+            `DELETE
+            FROM events
+            WHERE event_id=$1`, [`${eventId}`]
+        );
+        return {success: true};
+    } catch (error) {
+        return {success: false, error: error};
+    }
+}
+
 export async function getCustomerEvents(email: string) {
     try {
         const customerId = (await query(
@@ -384,6 +579,19 @@ export async function getEvent(event_id: string) {
             FROM events e
             JOIN artists a on e.artist_id = a.artist_id
             JOIN venues v on e.venue_id = v.venue_id
+            WHERE e.event_id=cast($1 as bigint)`, [`${event_id}`]
+        );
+        return { success: true, result: result.rows[0]}
+    } catch (error) {
+        return { success: false, error: error};
+    }
+}
+
+export async function getFullEvent(event_id:string) {
+    try {
+        const result = await query(
+            `SELECT *
+            FROM events e
             WHERE e.event_id=cast($1 as bigint)`, [`${event_id}`]
         );
         return { success: true, result: result.rows[0]}

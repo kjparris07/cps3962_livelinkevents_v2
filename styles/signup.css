@@ -23,7 +23,7 @@ input {
   font-size: 16px;
 }
 
-button {
+.cta-btn {
   margin-top: 20px; /* space from company name */
   padding: 12px 28px;
   font-size: 16px;

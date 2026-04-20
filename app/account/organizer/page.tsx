@@ -30,7 +30,7 @@ export default function OrganizerAccountPage() {
             if (results && results.length > 0) {
               setEvents(results.map((event) => (
                 <div key={event.event_id} className="event-info">
-                  <h3 className="event-date">{event.event_date.toLocaleDateString()} — {event.event_title}</h3>
+                  <h3 className="event-date">{event.event_date.toLocaleDateString()} — <Link href={`/account/organizer/manage/${event.event_id}`}>{event.event_title}</Link></h3>
                   <h4 className="event-artist">{event.artist_name}</h4>
                   <h5 className="event-location">{event.venue_city}, {event.venue_state}</h5>
                 </div>
@@ -120,11 +120,14 @@ export default function OrganizerAccountPage() {
             </p>
 
             <div className="account-card-actions stacked-actions">
-              <button className="account-primary-btn" type="button">
+              <Link className="account-primary-btn" type="button" href={"/account/organizer/create"}>
                 Create New Event
-              </button>
-              <button className="account-secondary-btn" type="button">
+              </Link>
+              <Link className="account-secondary-btn" type="button" href={"/account/organizer/manage"}>
                 Manage Events
+              </Link>
+              <button >
+                
               </button>
             </div>
           </div>
