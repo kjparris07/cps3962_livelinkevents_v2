@@ -240,6 +240,11 @@ export async function deleteAccount(email:string, account_type: "customer" | "or
                         );
                         await query(
                             `DELETE
+                            FROM venues
+                            WHERE organizer_id=$1`, [`${id}`]
+                        );
+                        await query(
+                            `DELETE
                             FROM organizers
                             WHERE id=$1`, [`${id}`]
                         );

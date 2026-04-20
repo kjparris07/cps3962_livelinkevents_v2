@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -10,6 +10,13 @@ import "@/styles/account.css";
 export default function AccountPage() {
   const [cookies] = useCookies(["email", "accountType"]);
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoggedIn = mounted ? cookies.email : null;
 
   useEffect(() => {
     if (cookies.email && cookies.accountType) {
@@ -17,7 +24,7 @@ export default function AccountPage() {
     }
   }, [cookies.email, cookies.accountType, router]);
 
-  if (!cookies.email) {
+  if (!isLoggedIn) {
     return (
       <main>
         <h3>

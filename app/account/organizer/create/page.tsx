@@ -106,7 +106,7 @@ const onSubmit = async (data:any) => {
     try {
         const result = await createEvent(orgId, fd);
         if (result.success) {
-            router.push(`/account/organizer/manage/${result.event_id}`);
+            router.push(`/account/organizer/manage/`);
         } else {
             setMessage(`${result.error}`);
         }

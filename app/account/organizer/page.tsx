@@ -17,9 +17,16 @@ export default function OrganizerAccountPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoggedIn = mounted ? cookies.email : null;
+
   useEffect(() => {
     const fetchInfo = async () => {
-    if (cookies.email) {
       try {
         const db_info = await getAccountInfo("organizer", cookies.email);
         if (db_info.success) {
@@ -45,12 +52,10 @@ export default function OrganizerAccountPage() {
       } catch (err) {
         setMessage(`Fetch error: ${err}`);
       }
-    }
-    setLoading(false);
-  };
-  
-  fetchInfo();
-  }, [cookies.email]);
+      setLoading(false);
+    };
+    fetchInfo();
+  }, [isLoggedIn]);
 
   if (loading) return <div className="account-page">Loading...</div>;
   
