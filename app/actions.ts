@@ -230,6 +230,16 @@ export async function deleteAccount(email:string, account_type: "customer" | "or
                     } else {
                         await query(
                             `DELETE
+                            FROM organizer_events
+                            WHERE organizer_id=$1`, [`${id}`]
+                        );
+                        await query(
+                            `DELETE
+                            FROM events
+                            WHERE organizer_id=$1`, [`${id}`]
+                        );
+                        await query(
+                            `DELETE
                             FROM organizers
                             WHERE id=$1`, [`${id}`]
                         );
@@ -483,6 +493,11 @@ export async function updateEvent(eventId:string, fd: FormData){
 
 export async function deleteEvent(eventId:string){
     try {
+        await query(
+            `DELETE
+            FROM organizer_events
+            WHERE event_id=$1`, [`${eventId}`]
+        );
         await query(
             `DELETE
             FROM events
