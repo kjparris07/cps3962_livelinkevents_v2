@@ -92,7 +92,7 @@ export default function SignupPage() {
       <div className="signup-container container">
 
         <form onSubmit={handleSubmit(onSubmit)} className="sign-up-form">
-          <div className='login-title'>SIGN UP</div>
+          <div className='signin-title'>SIGN UP</div>
 
           {/* Shared Fields */}
           <div className="input-group">

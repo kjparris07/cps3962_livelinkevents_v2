@@ -43,7 +43,7 @@ export default function Home() {
 
           <form onSubmit={handleSubmit((d) => handleSearch("state", d))} className="search-card">
             <label className="field-label">Location</label>
-            <select {...register("state")} className="input-box" required>
+            <select {...register("state")} className="select" required>
               <option value="">Select a state</option>
               <option value="NJ">New Jersey</option>
               <option value="NY">New York</option>

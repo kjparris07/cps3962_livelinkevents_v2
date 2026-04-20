@@ -45,7 +45,7 @@ export default function LoginPage() {
     <main className="login-page">
       <form className="login-container" onSubmit={handleSubmit(onSubmit)}>
 
-        <div className="login-title">LOG IN</div>
+        <div className="signin-title">LOG IN</div>
         <div className="required-note">* Indicates required field</div>
 
         {error && (
