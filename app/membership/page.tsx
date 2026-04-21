@@ -1,4 +1,16 @@
+'use client'
+import { useCookies } from "react-cookie";
+import { useEffect, useState } from "react";
+
 export default function MembershipPage() {
+  const [cookies] = useCookies();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+      setMounted(true);
+  }, []);
+  
+    const isLoggedIn = mounted ? cookies.email : null;
+
   return (
     <main className="membership-page">
       <section className="membership-wrapper">
@@ -23,7 +35,7 @@ export default function MembershipPage() {
               <li>Exclusive promotional offers</li>
             </ul>
             <div className="plan-price">$9.99 / month</div>
-            <a href="/login" className="plan-button">
+            <a href={isLoggedIn ? "/payment/plan?plan=premium" : "/login"} className="plan-button">
               Choose Premium
             </a>
           </div>
@@ -41,7 +53,7 @@ export default function MembershipPage() {
               <li>Special featured event perks</li>
             </ul>
             <div className="plan-price">$19.99 / month</div>
-            <a href="/login" className="plan-button">
+            <a href={isLoggedIn ? "/payment/plan?plan=elite" : "/login"} className="plan-button">
               Choose Elite
             </a>
           </div>
@@ -60,7 +72,7 @@ export default function MembershipPage() {
             <li>Create and manage an account</li>
             <li>Receive standard updates</li>
           </ul>
-          <a href="/login" className="basic-plan-button">
+          <a href={isLoggedIn ? "/payment/plan?plan=basic" : "/login"} className="basic-plan-button">
             Join Our Free Membership
           </a>
         </div>
