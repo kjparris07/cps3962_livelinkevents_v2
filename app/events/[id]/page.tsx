@@ -6,8 +6,8 @@ import { getEvent } from "@/app/actions";
 import { Event } from "@/app/globalComponents/Event";
 import * as React from 'react';
 import { Ticket } from "@/app/globalComponents/Ticket";
-import "../../../styles/main.css";
-import "../../../styles/events.css";
+import "@/styles/main.css";
+import "@/styles/events.css";
 
 type PageProps = {
   params: Promise<{ id: string }>; 
@@ -45,7 +45,7 @@ export default function EventTicketPage({ params }: PageProps) {
   if (!event) {
     return (
       <main className="container">
-        <h1 search-title>Loading event...</h1>
+        <h1 className="search-title">Loading event...</h1>
         <Link href="/events" className="view-events-btn">
           Back to all events
         </Link>

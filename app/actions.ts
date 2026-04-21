@@ -95,12 +95,17 @@ export async function createAccount(formData: FormData) {
                 const fName = formData.get('fName') as string;
                 const lName = formData.get('lName') as string;
                 const dob = formData.get('dob') as string;
+                const plan = formData.get('plan') as string;
                 
                 await query(
-                    `INSERT INTO customers
-                    VALUES ($1, $2, $3, $4, now(), $5)`,
-                    [`${email}`, `${fName}`, `${lName}`, `${dob}`, user_id]
+                    `INSERT 
+                    INTO customers 
+                    (email, first_name, last_name, dob, date_registered, id, plan)
+                    VALUES ($1, $2, $3, $4, now(), $5, $6)
+                    RETURNING plan`,
+                    [`${email}`, `${fName}`, `${lName}`, `${dob}`, user_id, `basic`]
                 );
+                return {success: true, plan: plan};
             } else {
                 const phone = formData.get('phone');
                 const name = formData.get('name');
@@ -227,6 +232,11 @@ export async function deleteAccount(email:string, account_type: "customer" | "or
                             FROM customers
                             WHERE id=$1`, [`${id}`]
                         );
+                        await query(
+                            `DELETE
+                            FROM customer_events
+                            WHERE customer_id=$1`, [`${id}`]
+                        );
                     } else {
                         await query(
                             `DELETE
@@ -323,6 +333,28 @@ export async function getOrganizerId(email : string) {
             WHERE email=$1`, [`${email}`]
         )).rows[0].id;
         return { success: true, id: id };
+    } catch (error) {
+        return {success: false, error: error};
+    }
+}
+
+export async function purchaseTicket(email: string, event_id:string) {
+    try {
+        const customer = (await query(
+            `SELECT id
+            FROM customers
+            WHERE email=$1`, [`${email}`]
+        )).rows
+        if (customer.length > 1) throw Error("More than one customer account found.")
+        if (customer.length < 1) throw Error("No customer account found.")
+        const customer_id = customer[0].id;
+        
+        await query(
+            `INSERT INTO customer_events
+            VALUES ($1, $2)`, [`${customer_id}`, `${event_id}`]
+        );
+
+        return {success: true};
     } catch (error) {
         return {success: false, error: error};
     }

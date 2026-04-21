@@ -7,6 +7,7 @@ import { CustomerDBInfo } from '@/app/globalComponents/CustomerDBInfo';
 import "@/styles/account.css";
 import "@/styles/main.css";
 import Link from 'next/link';
+import { membershipPlans } from '@/lib/memberships';
 
 export default function CustomerPage() {
   const [cookies] = useCookies(['email']);
@@ -26,16 +27,8 @@ export default function CustomerPage() {
             if (customer_events.success) {
               const results = customer_events.data;
               if (results && results.length > 0) {
-                setEvents(results.map((event) => {
-                  <div key={event.event_id} className="event-info">
-                    <h3 className="event-date">{event.event_date.toLocaleDateString()} — {event.event_title}</h3>
-                    <h4 className="event-artist">{event.artist_name}</h4>
-                    <h5 className="event-location">{event.venue_city}, {event.venue_state}</h5>
-                  </div>
-                }));
-              } else {
-                setEvents([<p key='no-results'>No events found. Try purchasing a ticket!</p>]);
-              }
+                setEvents(results);
+              } 
             }
           } else {
             setMessage("Could not fetch from database.");
@@ -53,7 +46,11 @@ export default function CustomerPage() {
   if (!customer || loading) return <div className="account-page">Loading...</div>;
   if (message) return <main>{message}</main>;
 
-  return (
+  const perks = customer.plan === "premium" ? membershipPlans.premium.perks : 
+              customer.plan === "elite" ? membershipPlans.elite.perks :
+              membershipPlans.basic.perks
+  
+    return (
     <main className="account-page">
       <section className="account-wrapper">
         <div className="account-header">
@@ -90,12 +87,13 @@ export default function CustomerPage() {
           <div className="account-card">
             <h2>Membership</h2>
             <p>
-              <strong>Current Plan:</strong> {customer.plan || "Basic Free Plan"}
+              <strong>Current Plan:</strong> {customer.plan.toUpperCase() || "Basic Free Plan"}
             </p>
-            <p>
-              Enjoy early access opportunities, event alerts, and account tools
-              based on your plan.
-            </p>
+            <ul style={{marginLeft:"20px"}}>
+              {perks.map((perk, index) => (
+                <li key={`perk${index}`}>{perk}</li>
+              ))}
+            </ul>
 
             <div className="account-card-actions">
               <Link href="/membership" className="account-primary-btn">
@@ -106,13 +104,22 @@ export default function CustomerPage() {
 
           <div className="account-card">
             <h2>Upcoming Tickets</h2>
-            {events}
-
-            <div className="account-card-actions">
+            {events ? 
+            events.map((event) => (
+              <div key={event.event_id} className="event-info">
+                <h3 className="event-date">{event.event_date.toLocaleDateString()} — <Link href={`/events/${event.event_id}`}>{event.event_title}</Link></h3>
+                <h4 className="event-artist">{event.artist_name}</h4>
+                <h5 className="event-location">{event.venue_city}, {event.venue_state}</h5>
+              </div>
+            )) : 
+            <>
+              <p key='no-results'>No events found. Try purchasing a ticket!</p>
+              <div className="account-card-actions">
               <Link href="/events" className="account-primary-btn">
-                View Events
+                View All Events
               </Link>
             </div>
+            </>}
           </div>
 
           <div className="account-card">

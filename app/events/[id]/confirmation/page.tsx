@@ -49,8 +49,11 @@ export default function ConfirmationPage({params}: PageProps) {
         <p>{event.event_date.toDateString()}</p>
       </section>
 
-      <section className="ticket-section">
+      <section className="ticket-section" style={{display:"flex", flexDirection:"column"}}>
         <p>Your ticket details have been emailed to you.</p>
+        <button className="view-events-btn" onClick={() => window.print()} style={{width:"fit-content"}}>
+          Print Confirmation
+        </button>
         <Link href="/events" className="view-events-btn">
           Back to Events
         </Link>

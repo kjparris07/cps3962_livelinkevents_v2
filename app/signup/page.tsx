@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, use } from "react";
 import { useForm } from "react-hook-form";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
@@ -18,16 +18,23 @@ type SignUpFormData = {
   fName?: string;
   lName?: string;
   dob?: string;
+  plan?: 'basic' | 'premium' | 'elite';
   // Organizer ONLY fields
   name?: string;
   phone?: string;
   company?: string;
 };
 
-export default function SignupPage() {
+export default function SignupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ plan?: string }>
+}) {
   const router = useRouter();
+  const params = use(searchParams);
   const [ _, setCookie ] = useCookies();
   const [loading, setLoading] = useState(false);
+  const { replace } = useRouter();
   const { register, watch, handleSubmit } = useForm<SignUpFormData>({
     defaultValues: {
       account_type: 'customer'
@@ -74,7 +81,14 @@ export default function SignupPage() {
       setCookie("email", fd.get('email'));
       if (accountType === "customer") {
         setCookie("accountType", "customer");
-        router.push("/account/customer");
+        if (result.plan === "basic") {
+          router.push("/account/customer");
+        } else {
+          const paramSet = new URLSearchParams(await searchParams);
+          paramSet.set("plan", result.plan === "premium" ? "premium" : "elite");
+          replace(`/payment/plan/?${paramSet.toString()}`);
+        }
+        
       } else {
         setCookie("accountType", "organizer");
         router.push("/account/organizer");
@@ -120,6 +134,13 @@ export default function SignupPage() {
               
               <label className="input-label">Date of Birth:</label>
               <input className="input-box" {...register("dob", { required: true })} type="date" />
+
+              <label className="input-label">Membership Plan</label>
+              <select className="input-box" {...register("plan", { required: true })}>
+                <option value="basic">Basic - FREE</option>
+                <option value="premium">Premium - $9.99 / month</option>
+                <option value="elite">Elite - $19.99 / month</option>
+              </select>
             </div>
           )}
 

@@ -4,19 +4,34 @@ import { Event } from "@/app/globalComponents/Event";
 import { Ticket } from "@/app/globalComponents/Ticket";
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { getEvent } from "@/app/actions";
+import { useForm } from "react-hook-form";
+import { getEvent, purchaseTicket } from "@/app/actions";
 import Link from "next/link";
 import "@/styles/events.css";
 import "@/styles/main.css";
 import "@/styles/payment.css";
+import { useCookies } from "react-cookie";
+import { useRouter } from "next/navigation";
 
 type PageProps = {
   params: Promise<{ id: string }>; 
 };
 
 export default function TicketPaymentPage({params}:PageProps) {
+  const [cookies] = useCookies();
   const [ event, setEvent ] = useState<Event>();
+  const [message, setMessage] = useState("");
+  const [mounted, setMounted] = useState(false);
   const {id} = React.use(params);
+  const { handleSubmit } = useForm();
+  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoggedIn = mounted ? cookies.email : null;
+
   useEffect(() => {
     const fetchEvent = async () => {
       const result = await getEvent(id);
@@ -43,6 +58,21 @@ export default function TicketPaymentPage({params}:PageProps) {
     fetchEvent();
   }, []);
 
+  const onSubmit = async () => {
+    try {
+      if (isLoggedIn && event){
+        const purchase = await purchaseTicket(cookies.email, event.event_id);
+        if (purchase.success) {
+          router.push(`/events/${event.event_id}/confirmation`);
+        } else {
+          throw Error(`${purchase.error}`);
+        }
+      }
+    } catch (error) {
+      setMessage(`${error}`);
+    }
+  }
+
   if (!event) {
     return (
       <main className="container">
@@ -57,13 +87,14 @@ export default function TicketPaymentPage({params}:PageProps) {
   return (
     <main className="payment-container ">
 
+      <div className="error">{message}</div>
       <h1 className="title">Payment for {event.event_title}</h1>
       <p>{event.venue_city}, {event.venue_state}</p>
       <p>{event.event_date.toDateString()}</p>
 
       <section className="ticket-section">
         <h2>Select Ticket Type</h2>
-        <form className="payment-form">
+        <form className="payment-form" onSubmit={handleSubmit(onSubmit)}>
           <label className="field-label">
             Ticket Option
             <select name="ticket" className="input-box">
@@ -90,13 +121,9 @@ export default function TicketPaymentPage({params}:PageProps) {
             <input type="text" className="input-box" placeholder="123" required />
           </label>
 
-          <Link
-            href={`/events/${event.event_id}/confirmation`}
-            className="view-events-btn"
-            style={{ marginTop: "20px", display: "inline-block" }}
-          >
+          <button className="view-events-btn" style={{ marginTop: "20px", display: "inline-block" }}>
             Complete Purchase
-          </Link>
+          </button>
         </form>
       </section>
     </main>

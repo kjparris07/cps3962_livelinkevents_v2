@@ -45,9 +45,6 @@ export default function EventsPage() {
 
       case "priceLow":
         return a.tickets[0].price - b.tickets[0].price;
-
-      case "priceHigh":
-        return a.tickets[a.tickets.length-1].price - b.tickets[b.tickets.length-1].price;
       
         default:
         return 0;
@@ -72,7 +69,6 @@ export default function EventsPage() {
           <option value="az">Alphabetical (A–Z)</option>
           <option value="date">Closest Date</option>
           <option value="priceLow">Price: Low → High</option>
-          <option value="priceHigh">Price: High → Low</option>
         </select>
       </div>
 
